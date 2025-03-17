@@ -1,6 +1,5 @@
 "use server";
 
-import { getMatches, getMatch } from "@/lib/matches";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
@@ -17,6 +16,21 @@ async function ensureDataDir() {
 	}
 }
 
+async function readMatchesFromFile() {
+	try {
+		const data = await fs.readFile(dataFilePath, "utf8");
+		return JSON.parse(data);
+	} catch {
+		// If file doesn't exist yet, return empty array
+		return [];
+	}
+}
+
+async function readMatchFromFile(id) {
+	const matches = await readMatchesFromFile();
+	return matches.find(match => match.id === id);
+}
+
 // Save matches data
 async function saveMatches(matches) {
 	await ensureDataDir();
@@ -24,8 +38,8 @@ async function saveMatches(matches) {
 }
 
 // Create a new match
-export async function createMatch(formData) {
-	const matches = await getMatches();
+async function createMatch(formData) {
+	const matches = await readMatchesFromFile();
 
 	const newMatch = {
 		id: Date.now().toString(),
@@ -48,8 +62,8 @@ export async function createMatch(formData) {
 }
 
 // Update a match
-export async function updateMatch(id, formData) {
-	const matches = await getMatches();
+async function updateMatch(id, formData) {
+	const matches = await readMatchesFromFile();
 	const match = await getMatch(id);
 
 	if (!match) {
@@ -75,8 +89,8 @@ export async function updateMatch(id, formData) {
 }
 
 // Update match score
-export async function updateMatchScore(id, scoreData) {
-	const matches = await getMatches();
+async function updateMatchScore(id, scoreData) {
+	const matches = await readMatchesFromFile();
 	const match = await getMatch(id);
 
 	if (!match) {
@@ -103,8 +117,8 @@ export async function updateMatchScore(id, scoreData) {
 }
 
 // Delete a match
-export async function deleteMatch(id) {
-	const matches = await getMatches();
+async function deleteMatch(id) {
+	const matches = await readMatchesFromFile();
 	const filteredMatches = matches.filter(match => match.id !== id);
 
 	if (filteredMatches.length < matches.length) {
@@ -116,3 +130,6 @@ export async function deleteMatch(id) {
 
 	return false;
 }
+
+export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch };
+export { createMatch, updateMatch, updateMatchScore, deleteMatch };

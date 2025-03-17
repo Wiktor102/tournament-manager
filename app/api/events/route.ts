@@ -1,5 +1,5 @@
+import { getMatch } from "@/app/actions/matchActions";
 import { NextRequest, NextResponse } from "next/server";
-import { getMatchById } from "@/lib/data";
 
 // Connection store - in a real app, use Redis or similar
 const connections = new Map<string, ReadableStreamController<Uint8Array>>();
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 	}
 
 	// Check if the match exists
-	const match = await getMatchById(matchId);
+	const match = await getMatch(matchId);
 	if (!match) {
 		return new NextResponse("Match not found", { status: 404 });
 	}
