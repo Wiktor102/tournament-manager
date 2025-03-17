@@ -2,6 +2,7 @@
 
 import MatchForm from "@/components/MatchForm/MatchForm";
 import "./AdminPage.scss";
+import MatchesList from "@/components/MatchList/MatchesList";
 
 export default function AdminPage() {
 	return (
@@ -15,6 +16,7 @@ export default function AdminPage() {
 
 			<div className="matches-container">
 				<h2 className="section-title">Wszystkie mecze</h2>
+				<MatchesList />
 			</div>
 		</div>
 	);

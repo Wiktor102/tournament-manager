@@ -69,3 +69,5 @@ function MatchesList() {
 		</ul>
 	);
 }
+
+export default MatchesList;
