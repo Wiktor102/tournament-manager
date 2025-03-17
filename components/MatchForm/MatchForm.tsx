@@ -4,21 +4,27 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createMatch, updateMatch } from "@/app/actions/matchActions";
 import "./MatchForm.scss";
-import { MatchData } from "@/types/types";
+import { Match, MatchData } from "@/types/types";
 
 interface MatchFormProps {
-	match?: MatchData;
+	match?: Match;
 }
 
 export default function MatchForm({ match }: MatchFormProps) {
 	const router = useRouter();
 	const isEditing = !!match;
 
+	if (match?.status === "finished") {
+		throw new Error("Cannot edit finished match");
+	}
+
 	const [formData, setFormData] = useState<MatchData>({
-		homeTeam: match?.homeTeam || "",
-		awayTeam: match?.awayTeam || "",
+		homeTeam: match?.team1 || "",
+		awayTeam: match?.team2 || "",
 		pitchId: match?.pitchId || 1,
-		date: match?.date ? match.date.slice(0, 16) : ""
+		status: match?.status || "scheduled",
+		date: ""
+		// date: match?.currentTime ? match.date.slice(0, 16) : ""
 	});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,14 +41,17 @@ export default function MatchForm({ match }: MatchFormProps) {
 				}
 			} else {
 				await createMatch(formData);
+
 				// Clear form after successful submission
 				setFormData({
 					homeTeam: "",
 					awayTeam: "",
 					pitchId: 1,
+					status: "scheduled",
 					date: ""
 				});
 			}
+
 			// Router refresh happens automatically because of revalidatePath
 			// in the server action, but it doesn't hurt to call it again
 			router.refresh();
@@ -91,10 +100,22 @@ export default function MatchForm({ match }: MatchFormProps) {
 				</select>
 			</div>
 
-			<div className="mt-4">
-				<button type="submit" className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
-					{isEditing ? "Update Match" : "Add Match"}
-				</button>
+			<div>
+				<label htmlFor="status">Status: </label>
+				<select
+					id="status"
+					name="status"
+					value={formData.status}
+					onChange={e => setFormData(prev => ({ ...prev, status: e.target.value as "scheduled" | "live" }))}
+					required
+				>
+					<option value="scheduled">Zaplanowany</option>
+					<option value="live">LIVE (rozpocznij od razu)</option>
+				</select>
+			</div>
+
+			<div>
+				<button type="submit">{isEditing ? "Zaktualizuj mecz" : "Dodaj mecz"}</button>
 			</div>
 		</form>
 	);

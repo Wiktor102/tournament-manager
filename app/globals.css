@@ -5,38 +5,87 @@
 }
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    /* Base colors */
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #ededed;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #a0aec0;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #333333;
+    --color-gray-800: #242424;
+    --color-gray-900: #1a1a1a;
+    --color-gray-950: #0a0a0a;
+
+    --color-green-500: #16a34a;
+    --color-green-600: #15803d;
+
+    --color-blue-500: #2563eb;
+    --color-blue-600: #1d4ed8;
+
+    --color-red-500: #dc2626;
+    --color-red-600: #b91c1c;
+
+    --color-yellow-400: #f1c40f;
+
+    /* Semantic variables - light theme defaults */
+    --background: var(--color-white);
+    --foreground: var(--color-gray-900);
+    --surface: var(--color-white);
+    --section-border: var(--color-gray-200);
+    --empty-state: var(--color-gray-500);
+    --text-secondary: var(--color-gray-600);
+    --shadow: rgba(0, 0, 0, 0.1);
+    --header-background: var(--color-gray-200);
+
+    /* Button colors */
+    --button-live-score: var(--color-green-500);
+    --button-live-score-hover: var(--color-green-600);
+    --button-edit: var(--color-blue-500);
+    --button-edit-hover: var(--color-blue-600);
+    --button-delete: var(--color-red-500);
+    --button-delete-hover: var(--color-red-600);
+    --link-hover: var(--color-yellow-400);
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+    :root {
+        /* Semantic variables - dark theme overrides */
+        --background: var(--color-gray-950);
+        --foreground: var(--color-gray-100);
+        --surface: var(--color-gray-800);
+        --section-border: var(--color-gray-700);
+        --empty-state: var(--color-gray-400);
+        --text-secondary: var(--color-gray-400);
+        --shadow: rgba(0, 0, 0, 0.5);
+        --header-background: var(--color-gray-900);
+    }
 }
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    color: var(--foreground);
+    background: var(--background);
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+    html {
+        color-scheme: dark;
+    }
 }

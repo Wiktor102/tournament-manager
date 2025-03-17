@@ -3,43 +3,43 @@
 		font-size: 1.875rem;
 		font-weight: bold;
 		margin-bottom: 1.5rem;
-		color: light-dark(inherit, #fff);
+		color: var(--foreground);
 	}
 
 	.add-match-container {
 		margin-bottom: 2rem;
-		background-color: light-dark(white, #191919);
+		background-color: var(--surface);
 		padding: 1.5rem;
 		border-radius: 0.25rem;
-		box-shadow: 0 1px 3px 0 light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+		box-shadow: 0 1px 3px 0 var(--shadow);
 	}
 
 	.section-title {
 		font-size: 1.25rem;
 		font-weight: bold;
 		margin-bottom: 1rem;
-		color: light-dark(inherit, #fff);
+		color: var(--foreground);
 	}
 
 	.matches-container {
-		background-color: light-dark(white, #191919);
+		background-color: var(--surface);
 		border-radius: 0.25rem;
-		box-shadow: 0 1px 3px 0 light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+		box-shadow: 0 1px 3px 0 var(--shadow);
 
 		.section-title {
 			padding: 1rem;
-			border-bottom: 1px solid light-dark(#e5e7eb, #333);
+			border-bottom: 1px solid var(--section-border);
 			margin-bottom: 0;
 		}
 	}
 
 	.empty-state {
 		padding: 1rem;
-		color: light-dark(#6b7280, #a0aec0);
+		color: var(--empty-state);
 	}
 
 	.match-item {
-		border-bottom: 1px solid light-dark(#e5e7eb, #333);
+		border-bottom: 1px solid var(--section-border);
 		padding: 1rem;
 		display: flex;
 		justify-content: space-between;
@@ -52,17 +52,17 @@
 
 	.match-teams {
 		font-weight: bold;
-		color: light-dark(inherit, #fff);
+		color: var(--foreground);
 	}
 
 	.match-details {
 		font-size: 0.875rem;
-		color: light-dark(#4b5563, #a0aec0);
+		color: var(--text-secondary);
 	}
 
 	.match-status {
 		font-size: 0.875rem;
-		color: light-dark(#4b5563, #a0aec0);
+		color: var(--text-secondary);
 
 		.status-value {
 			text-transform: capitalize;
@@ -86,28 +86,28 @@
 
 	.live-score-button {
 		@extend .button;
-		background-color: #16a34a;
+		background-color: var(--button-live-score);
 
 		&:hover {
-			background-color: #15803d;
+			background-color: var(--button-live-score-hover);
 		}
 	}
 
 	.edit-button {
 		@extend .button;
-		background-color: #2563eb;
+		background-color: var(--button-edit);
 
 		&:hover {
-			background-color: #1d4ed8;
+			background-color: var(--button-edit-hover);
 		}
 	}
 
 	.delete-button {
 		@extend .button;
-		background-color: #dc2626;
+		background-color: var(--button-delete);
 
 		&:hover {
-			background-color: #b91c1c;
+			background-color: var(--button-delete-hover);
 		}
 	}
 }
