@@ -14,7 +14,7 @@ export interface MatchData {
 	awayTeam: string;
 	date: string;
 	pitchId: 1 | 2;
-	[key: string]: unknown;
+	status: "scheduled" | "live";
 }
 
 export interface MatchUpdate {
