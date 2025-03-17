@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 
 // Hard-coded admin password
@@ -13,7 +12,7 @@ const verifyPassword = (password: string): boolean => {
 	return password === ADMIN_PASSWORD;
 };
 
-const login = async (password: string): Promise<NextResponse<{ success: boolean; error?: string }>> => {
+const login = async (password: string): Promise<{ success: boolean; error?: string }> => {
 	const isValid = verifyPassword(password);
 
 	if (isValid) {
@@ -25,9 +24,9 @@ const login = async (password: string): Promise<NextResponse<{ success: boolean;
 			path: "/"
 		});
 
-		return NextResponse.json({ success: true });
+		return { success: true };
 	} else {
-		return NextResponse.json({ success: false, error: "Invalid password" }, { status: 401 });
+		return { success: false, error: "Invalid password" };
 	}
 };
 
