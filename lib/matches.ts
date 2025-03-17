@@ -1,26 +1,8 @@
 "use server";
 
+import { Match, MatchData } from "@/types/types";
 import fs from "fs/promises";
 import path from "path";
-
-interface Match {
-	id: string;
-	homeTeam: string;
-	awayTeam: string;
-	homeScore: number;
-	awayScore: number;
-	date: string;
-	status: string;
-	currentMinute: number;
-	createdAt: string;
-}
-
-interface MatchData {
-	homeTeam: string;
-	awayTeam: string;
-	date: string;
-	[key: string]: unknown;
-}
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
 
@@ -62,14 +44,12 @@ export async function createMatch(matchData: MatchData): Promise<Match> {
 	const matches = await getMatches();
 	const newMatch: Match = {
 		id: Date.now().toString(),
-		homeTeam: matchData.homeTeam,
-		awayTeam: matchData.awayTeam,
-		homeScore: 0,
-		awayScore: 0,
-		date: matchData.date,
-		status: "scheduled",
-		currentMinute: 0,
-		createdAt: new Date().toISOString()
+		team1: matchData.homeTeam,
+		team2: matchData.awayTeam,
+		pitchId: matchData.pitchId,
+		isLive: false,
+		score1: 0,
+		score2: 0
 	};
 
 	matches.push(newMatch);

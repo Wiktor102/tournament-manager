@@ -46,17 +46,17 @@ export default function LiveScore({ matchId, initialData }: { matchId: string; i
 
 			<div className="match-header">
 				<h2>
-					{match.teamHome} vs {match.teamAway}
+					{match.team1} vs {match.team2}
 				</h2>
 				{match.status === "live" && <div className="live-badge">LIVE</div>}
 			</div>
 
 			<div className="score-display">
-				<span className="team">{match.teamHome}</span>
+				<span className="team">{match.team1}</span>
 				<span className="score">
-					{match.scoreHome} - {match.scoreAway}
+					{match.score1} - {match.score2}
 				</span>
-				<span className="team">{match.teamAway}</span>
+				<span className="team">{match.team2}</span>
 			</div>
 
 			{match.currentTime && <div className="match-time">{match.currentTime}</div>}

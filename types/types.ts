@@ -1,13 +1,20 @@
 export interface Match {
 	id: string;
-	teamHome: string;
-	teamAway: string;
-	scoreHome: number;
-	scoreAway: number;
+	team1: string;
+	team2: string;
+	pitchId: 1 | 2;
+	score1: number;
+	score2: number;
+	currentTime?: string;
 	status: "scheduled" | "live" | "finished";
-	startTime: string; // ISO string
-	currentTime?: string; // Game time like "45:00" or "HT"
-	isLive: boolean;
+}
+
+export interface MatchData {
+	homeTeam: string;
+	awayTeam: string;
+	date: string;
+	pitchId: 1 | 2;
+	[key: string]: unknown;
 }
 
 export interface MatchUpdate {
