@@ -1,10 +1,13 @@
-"use client";
+"use server";
 
 import MatchForm from "@/components/MatchForm/MatchForm";
 import "./AdminPage.scss";
 import MatchesList from "@/components/MatchList/MatchesList";
+import { getMatches } from "../actions/matchActions";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+	const matches = await getMatches();
+
 	return (
 		<div className="admin-page">
 			<h1 className="page-title">Zarządzanie turniejem</h1>
@@ -16,7 +19,7 @@ export default function AdminPage() {
 
 			<div className="matches-container">
 				<h2 className="section-title">Wszystkie mecze</h2>
-				<MatchesList />
+				<MatchesList matches={matches} />
 			</div>
 		</div>
 	);

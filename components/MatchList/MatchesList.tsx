@@ -1,19 +1,10 @@
-import { deleteMatch, getMatches } from "@/app/actions/matchActions";
+"use server";
+
 import { Match } from "@/types/types";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import DeleteMatch from "./DeleteMatch";
 
-function MatchesList() {
-	const [matches, setMatches] = useState<Match[]>([]);
-
-	useEffect(() => {
-		const fetchMatches = async () => {
-			const data = await getMatches();
-			setMatches(data);
-		};
-
-		fetchMatches();
-	}, []);
+function MatchesList({ matches }: { matches: Match[] }) {
 	if (matches.length == 0) return <p className="empty-state">Brak meczów</p>;
 
 	return (
@@ -46,23 +37,7 @@ function MatchesList() {
 						<Link href={`/admin/match/${match.id}/edit`} className="edit-button">
 							Zarządzaj
 						</Link>
-						<form
-							action={() => {
-								deleteMatch(match.id);
-							}}
-						>
-							<button
-								type="submit"
-								className="delete-button"
-								onClick={e => {
-									if (!confirm("Are you sure you want to delete this match?")) {
-										e.preventDefault();
-									}
-								}}
-							>
-								Usuń
-							</button>
-						</form>
+						<DeleteMatch id={match.id} />
 					</div>
 				</li>
 			))}

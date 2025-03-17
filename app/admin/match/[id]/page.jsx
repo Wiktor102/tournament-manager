@@ -1,4 +1,4 @@
-import { getMatch } from "@/lib/matches";
+import { getMatch } from "@/app/actions/matchActions";
 import LiveScoreUpdater from "@/components/LiveScoreUpdater";
 import { notFound } from "next/navigation";
 
