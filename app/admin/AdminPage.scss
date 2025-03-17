@@ -1,0 +1,113 @@
+.admin-page {
+	.page-title {
+		font-size: 1.875rem;
+		font-weight: bold;
+		margin-bottom: 1.5rem;
+		color: light-dark(inherit, #fff);
+	}
+
+	.add-match-container {
+		margin-bottom: 2rem;
+		background-color: light-dark(white, #191919);
+		padding: 1.5rem;
+		border-radius: 0.25rem;
+		box-shadow: 0 1px 3px 0 light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+	}
+
+	.section-title {
+		font-size: 1.25rem;
+		font-weight: bold;
+		margin-bottom: 1rem;
+		color: light-dark(inherit, #fff);
+	}
+
+	.matches-container {
+		background-color: light-dark(white, #191919);
+		border-radius: 0.25rem;
+		box-shadow: 0 1px 3px 0 light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
+
+		.section-title {
+			padding: 1rem;
+			border-bottom: 1px solid light-dark(#e5e7eb, #333);
+			margin-bottom: 0;
+		}
+	}
+
+	.empty-state {
+		padding: 1rem;
+		color: light-dark(#6b7280, #a0aec0);
+	}
+
+	.match-item {
+		border-bottom: 1px solid light-dark(#e5e7eb, #333);
+		padding: 1rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	.match-teams {
+		font-weight: bold;
+		color: light-dark(inherit, #fff);
+	}
+
+	.match-details {
+		font-size: 0.875rem;
+		color: light-dark(#4b5563, #a0aec0);
+	}
+
+	.match-status {
+		font-size: 0.875rem;
+		color: light-dark(#4b5563, #a0aec0);
+
+		.status-value {
+			text-transform: capitalize;
+		}
+	}
+
+	.actions-container {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.button {
+		color: white;
+		padding: 0.25rem 0.75rem;
+		border-radius: 0.25rem;
+		font-size: 0.875rem;
+		transition: background-color 0.2s;
+		border: 0;
+		cursor: pointer;
+	}
+
+	.live-score-button {
+		@extend .button;
+		background-color: #16a34a;
+
+		&:hover {
+			background-color: #15803d;
+		}
+	}
+
+	.edit-button {
+		@extend .button;
+		background-color: #2563eb;
+
+		&:hover {
+			background-color: #1d4ed8;
+		}
+	}
+
+	.delete-button {
+		@extend .button;
+		background-color: #dc2626;
+
+		&:hover {
+			background-color: #b91c1c;
+		}
+	}
+}
