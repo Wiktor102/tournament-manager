@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
+import { v4 as uuid } from "uuid";
 import { Match, MatchData, MatchUpdate } from "../../types/types";
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
@@ -18,6 +19,7 @@ async function ensureDataDir() {
 }
 
 async function readMatchesFromFile(): Promise<Match[]> {
+	"use server";
 	try {
 		const data = await fs.readFile(dataFilePath, "utf8");
 		return JSON.parse(data);
@@ -43,7 +45,7 @@ async function createMatch(formData: MatchData): Promise<Match> {
 	const matches = await readMatchesFromFile();
 
 	const newMatch: Match = {
-		id: Date.now().toString(),
+		id: uuid(),
 		team1: formData.homeTeam.toUpperCase(),
 		team2: formData.awayTeam.toUpperCase(),
 		score1: 0,
@@ -117,18 +119,16 @@ async function updateMatchScore(id: string, scoreData: MatchUpdate): Promise<Mat
 }
 
 // Delete a match
-async function deleteMatch(id: string): Promise<boolean> {
+async function deleteMatch(formData: FormData): Promise<void> {
+	const matchId = formData.get("matchId")! as string;
 	const matches = await readMatchesFromFile();
-	const filteredMatches = matches.filter(match => match.id !== id);
+	const filteredMatches = matches.filter(match => match.id !== matchId);
 
 	if (filteredMatches.length < matches.length) {
 		await saveMatches(filteredMatches);
 		revalidatePath("/admin");
 		revalidatePath("/");
-		return true;
 	}
-
-	return false;
 }
 
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch };
