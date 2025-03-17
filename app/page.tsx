@@ -1,6 +1,12 @@
+import Link from "next/link";
+
 function Home() {
-	const randomNumber = Math.random() * 10;
-	return <h1>Main page {randomNumber}</h1>;
+	return (
+		<>
+			<h1>Main page</h1>
+			<Link href="/admin">Panel Administratorski</Link>
+		</>
+	);
 }
 
 export default Home;

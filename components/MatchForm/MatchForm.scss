@@ -11,6 +11,11 @@
 		color: var(--foreground);
 	}
 
+	input {
+		text-align: center;
+		text-transform: uppercase;
+	}
+
 	.teams-picker {
 		display: flex;
 		justify-content: space-between;
