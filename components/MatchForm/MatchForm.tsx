@@ -5,28 +5,42 @@ import { useRouter } from "next/navigation";
 import { createMatch, updateMatch } from "@/app/actions/matchActions";
 import "./MatchForm.scss";
 
-export default function MatchForm({ match }) {
+interface MatchFormProps {
+	match?: {
+		id: string;
+		homeTeam: string;
+		awayTeam: string;
+		date: string;
+	};
+}
+
+interface FormData {
+	homeTeam: string;
+	awayTeam: string;
+	date: string;
+}
+
+export default function MatchForm({ match }: MatchFormProps) {
 	const router = useRouter();
 	const isEditing = !!match;
 
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<FormData>({
 		homeTeam: match?.homeTeam || "",
 		awayTeam: match?.awayTeam || "",
 		date: match?.date ? match.date.slice(0, 16) : ""
 	});
-
-	const handleChange = e => {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setFormData(prev => ({ ...prev, [name]: value }));
 	};
 
-	const handleSubmit = async e => {
-		e.preventDefault();
-
+	const handleSubmit = async () => {
 		try {
 			if (isEditing) {
-				await updateMatch(match.id, formData);
-				router.push("/admin");
+				if (match) {
+					await updateMatch(match.id, formData);
+					router.push("/admin");
+				}
 			} else {
 				await createMatch(formData);
 				// Clear form after successful submission
@@ -45,7 +59,7 @@ export default function MatchForm({ match }) {
 	};
 
 	return (
-		<form className="add-match-form" onSubmit={handleSubmit}>
+		<form className="add-match-form" action={handleSubmit}>
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 				<div className="teams-picker">
 					<input

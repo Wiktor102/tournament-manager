@@ -5,8 +5,16 @@ import MatchForm from "@/components/MatchForm/MatchForm";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
+interface Match {
+	id: string;
+	homeTeam: string;
+	awayTeam: string;
+	date: string;
+	status: string;
+}
+
 export default function AdminPage() {
-	const [matches, setMatches] = useState([]);
+	const [matches, setMatches] = useState<Match[]>([]);
 
 	useEffect(() => {
 		const fetchMatches = async () => {
@@ -58,7 +66,11 @@ export default function AdminPage() {
 									>
 										Edit
 									</Link>
-									<form action={() => deleteMatch(match.id)}>
+									<form
+										action={() => {
+											deleteMatch(match.id);
+										}}
+									>
 										<button
 											type="submit"
 											className="bg-red-600 text-white py-1 px-3 rounded text-sm hover:bg-red-700"
