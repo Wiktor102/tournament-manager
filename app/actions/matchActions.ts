@@ -5,6 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { v4 as uuid } from "uuid";
 import { Match, MatchData } from "../../types/types";
+import { sendMatchUpdate } from "../api/events/route";
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
 
@@ -43,6 +44,8 @@ async function updateMatchInFile(id: string, update: Partial<Match>): Promise<Ma
 
 	revalidatePath("/admin");
 	revalidatePath(`/match/${id}`);
+
+	sendMatchUpdate(id, updatedMatch);
 
 	return updatedMatch;
 }
