@@ -16,6 +16,9 @@ export default async function MatchPage({ params }: { params: Promise<{ id: stri
 			<h1 className="text-3xl font-bold text-center mb-8">
 				{match.team1} vs {match.team2}
 			</h1>
+			<h1 className="text-3xl font-bold text-center mb-8">
+				{match.score1} : {match.score2}
+			</h1>
 
 			<div className="bg-white rounded-lg shadow-lg overflow-hidden">
 				<div className="bg-green-700 text-white p-4 text-center">

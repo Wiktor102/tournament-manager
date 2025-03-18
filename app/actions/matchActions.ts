@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import { v4 as uuid } from "uuid";
-import { Match, MatchData, MatchUpdate } from "../../types/types";
+import { Match, MatchData } from "../../types/types";
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
 
@@ -34,6 +34,25 @@ async function readMatchFromFile(id: string): Promise<Match | undefined> {
 	return matches.find(match => match.id === id);
 }
 
+async function updateMatchInFile(id: string, update: Partial<Match>): Promise<Match> {
+	const matches = await readMatchesFromFile();
+	const index = matches.findIndex(match => match.id === id);
+	const updatedMatch = { ...matches[index], ...update };
+	matches[index] = updatedMatch;
+	await fs.writeFile(dataFilePath, JSON.stringify(matches, null, 2));
+
+	revalidatePath("/admin");
+	revalidatePath(`/match/${id}`);
+
+	return updatedMatch;
+}
+
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// Actions
+// ----------------------------
+
 // Save matches data
 async function saveMatches(matches: Match[]): Promise<void> {
 	await ensureDataDir();
@@ -52,6 +71,7 @@ async function createMatch(formData: MatchData): Promise<Match> {
 		score2: 0,
 		pitchId: formData.pitchId,
 		status: "scheduled",
+		mode: "1x15", // TODO: Add mode to form
 		currentTime: "0"
 	};
 
@@ -65,55 +85,38 @@ async function createMatch(formData: MatchData): Promise<Match> {
 
 // Update a match
 async function updateMatch(id: string, formData: MatchData): Promise<Match> {
-	const matches = await readMatchesFromFile();
 	const match = await readMatchFromFile(id);
 
 	if (!match) {
 		throw new Error("Match not found");
 	}
 
-	const updatedMatch: Match = {
-		...match,
+	const updatedMatch: Partial<Match> = {
 		team1: formData.homeTeam.toUpperCase(),
 		team2: formData.awayTeam.toUpperCase(),
 		pitchId: formData.pitchId
 	};
 
-	const index = matches.findIndex(m => m.id === id);
-	matches[index] = updatedMatch;
+	return await updateMatchInFile(id, updatedMatch);
+}
 
-	await saveMatches(matches);
-	revalidatePath("/admin");
-	revalidatePath(`/match/${id}`);
-	revalidatePath("/");
+async function startMatch(id: string): Promise<Match> {
+	console.log("startMatch");
+	const match = await readMatchFromFile(id);
+	if (!match) throw new Error("Match not found");
+	if (match.status !== "scheduled") throw new Error("Match must be in the 'scheduled' state to start");
 
-	return updatedMatch;
+	const update: Partial<Match> = { status: "live", startedAt: Date.now() };
+	return await updateMatchInFile(id, update);
 }
 
 // Update match score
-async function updateMatchScore(id: string, scoreData: MatchUpdate): Promise<Match> {
-	const matches = await readMatchesFromFile();
+async function updateMatchScore(id: string, action: { team: "team1" | "team2"; change: number }): Promise<Match> {
 	const match = await readMatchFromFile(id);
 
-	if (!match) {
-		throw new Error("Match not found");
-	}
-
-	const updatedMatch: Match = {
-		...match,
-		score1: scoreData.scoreHome !== undefined ? scoreData.scoreHome : match.score1,
-		score2: scoreData.scoreAway !== undefined ? scoreData.scoreAway : match.score2,
-		currentTime: scoreData.currentTime !== undefined ? scoreData.currentTime : match.currentTime,
-		status: scoreData.status !== undefined ? scoreData.status : match.status
-	};
-
-	const index = matches.findIndex(m => m.id === id);
-	matches[index] = updatedMatch;
-
-	await saveMatches(matches);
-	revalidatePath("/admin");
-	revalidatePath(`/match/${id}`);
-	revalidatePath("/");
+	if (!match) throw new Error("Match not found");
+	const propertyToUpdate = action.team === "team1" ? "score1" : "score2";
+	const updatedMatch = await updateMatchInFile(id, { [propertyToUpdate]: match[propertyToUpdate] + action.change });
 
 	return updatedMatch;
 }
@@ -132,4 +135,5 @@ async function deleteMatch(formData: FormData): Promise<void> {
 }
 
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch };
-export { createMatch, updateMatch, updateMatchScore, deleteMatch };
+export { startMatch, updateMatchScore };
+export { createMatch, updateMatch, deleteMatch };

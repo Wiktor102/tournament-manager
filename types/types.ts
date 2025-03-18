@@ -2,11 +2,15 @@ export interface Match {
 	id: string;
 	team1: string;
 	team2: string;
+	status: "scheduled" | "live" | "half-time" | "finished";
+	mode: "1x15" | "2x10";
 	pitchId: 1 | 2;
+
 	score1: number;
 	score2: number;
+	startedAt?: number;
+	resumedAt?: number;
 	currentTime?: string;
-	status: "scheduled" | "live" | "finished";
 }
 
 export interface MatchData {

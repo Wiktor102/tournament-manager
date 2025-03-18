@@ -31,10 +31,10 @@ function MatchesList({ matches }: { matches: Match[] }) {
 					</div>
 
 					<div className="actions-container">
-						<Link href={`/admin/match/${match.id}`} className="live-score-button">
+						<Link href={`/match/${match.id}`} className="live-score-button">
 							Wynik LIVE
 						</Link>
-						<Link href={`/admin/match/${match.id}/edit`} className="edit-button">
+						<Link href={`/admin/match/${match.id}`} className="edit-button">
 							Zarządzaj
 						</Link>
 						<DeleteMatch id={match.id} />
