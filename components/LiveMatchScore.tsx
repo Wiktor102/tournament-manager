@@ -1,47 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Match } from "../types/types";
 import { getMatchStatus } from "@/lib/matchUtils";
-import { getMatch } from "@/app/actions/matchActions";
+import useLiveMatch from "@/lib/hooks/useLiveMatch";
 
 interface LiveMatchScoreProps {
 	match: Match;
 }
 
 export default function LiveMatchScore({ match: initialMatch }: LiveMatchScoreProps) {
-	const [match, setMatch] = useState<Match>(initialMatch);
+	const match = useLiveMatch(initialMatch);
 	const [statusText, statusColor] = getMatchStatus(match);
-
-	useEffect(() => {
-		// Set up event source for server-sent events
-		const eventSource = new EventSource(`/api/events?matchId=${match.id}`);
-
-		eventSource.onmessage = (event: MessageEvent) => {
-			const updatedMatch: Match = JSON.parse(event.data);
-			setMatch(updatedMatch);
-		};
-
-		eventSource.onerror = () => {
-			eventSource.close();
-
-			// Fallback to polling if SSE fails
-			console.warn("Server-sent events failed, falling back to polling");
-			const interval = setInterval(async () => {
-				try {
-					const data = await getMatch(match.id);
-					if (!data) throw new Error("Match not found");
-					setMatch(data);
-				} catch (error) {
-					console.error("Error polling for match updates", error);
-				}
-			}, 5000);
-
-			return () => clearInterval(interval);
-		};
-
-		return () => eventSource.close();
-	}, [match.id]);
 
 	return (
 		<div className="p-6">
