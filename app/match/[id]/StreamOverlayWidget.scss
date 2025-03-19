@@ -1,0 +1,28 @@
+.widget {
+	display: inline-flex;
+	position: relative;
+	padding: 0 1rem;
+	font-size: 1.5rem;
+	border-radius: 10rem;
+}
+
+.counter-widget {
+	background-color: #2e72b9;
+
+	& > span {
+		padding-block: 0.5rem;
+	}
+
+	.score {
+		margin-inline: 1rem;
+		padding-inline: 1rem;
+		background-color: #4a9ffa;
+		border-radius: 10rem;
+	}
+}
+
+.timer-widget {
+	padding: 0.5rem 1rem;
+	background-color: #4a9ffa;
+	margin-left: 1rem;
+}
