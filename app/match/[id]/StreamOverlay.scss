@@ -14,3 +14,56 @@ body {
 	padding: 1rem;
 	color: white;
 }
+
+.no-match-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+	background-color: rgba(0, 0, 0, 0.7);
+	border-radius: 8px;
+	color: #fff;
+
+	h3 {
+		margin-bottom: 1rem;
+		font-size: 1.5rem;
+	}
+
+	p {
+		margin: 0.5rem 0;
+		font-size: 1.2rem;
+	}
+
+	.waiting-text {
+		font-style: italic;
+		color: #ccc;
+		margin-top: 1rem;
+	}
+}
+
+.match-deleted-message {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+	background-color: rgba(220, 53, 69, 0.7); // A reddish background
+	border-radius: 8px;
+	color: white;
+
+	h3 {
+		margin-bottom: 1rem;
+		font-size: 1.5rem;
+	}
+
+	p {
+		margin: 0.5rem 0;
+		font-size: 1.2rem;
+	}
+
+	.info-text {
+		font-style: italic;
+		margin-top: 1rem;
+	}
+}
