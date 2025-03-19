@@ -2,30 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createMatch, updateMatch } from "@/app/actions/matchActions";
+import { createMatch } from "@/app/actions/matchActions";
 import "./MatchForm.scss";
-import { Match, MatchData } from "@/types/types";
+import { InitialMatchData } from "@/types/types";
 
-interface MatchFormProps {
-	match?: Match;
-}
-
-export default function MatchForm({ match }: MatchFormProps) {
+export default function MatchForm() {
 	const router = useRouter();
-	const isEditing = !!match;
 
-	if (match?.status === "finished") {
-		throw new Error("Cannot edit finished match");
-	}
-
-	const [formData, setFormData] = useState<MatchData>({
-		homeTeam: match?.team1 || "",
-		awayTeam: match?.team2 || "",
-		pitchId: match?.pitchId || 1,
-		status: match?.status || "scheduled",
-		date: ""
-		// date: match?.currentTime ? match.date.slice(0, 16) : ""
-	});
+	const initialData: InitialMatchData = {
+		homeTeam: "",
+		awayTeam: "",
+		rank: "",
+		mode: "1x15"
+	};
+	const [formData, setFormData] = useState<InitialMatchData>(initialData);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
@@ -34,23 +24,8 @@ export default function MatchForm({ match }: MatchFormProps) {
 
 	const handleSubmit = async () => {
 		try {
-			if (isEditing) {
-				if (match) {
-					await updateMatch(match.id, formData);
-					router.push("/admin");
-				}
-			} else {
-				await createMatch(formData);
-
-				// Clear form after successful submission
-				setFormData({
-					homeTeam: "",
-					awayTeam: "",
-					pitchId: 1,
-					status: "scheduled",
-					date: ""
-				});
-			}
+			await createMatch(formData);
+			setFormData(initialData); // Clear form
 
 			// Router refresh happens automatically because of revalidatePath
 			// in the server action, but it doesn't hurt to call it again
@@ -87,35 +62,32 @@ export default function MatchForm({ match }: MatchFormProps) {
 			</div>
 
 			<div>
-				<label htmlFor="pitch">Boisko: </label>
+				<label htmlFor="rank">Ranga rozgrywki: </label>
+				<input
+					id="rank"
+					name="rank"
+					value={formData.rank}
+					placeholder="np. 1/16"
+					onChange={e => setFormData(prev => ({ ...prev, rank: e.target.value }))}
+					required
+				/>
+			</div>
+			<div>
+				<label htmlFor="mode">Tryb rozgrywki: </label>
 				<select
-					id="pitch"
-					name="pitch"
-					value={formData.pitchId}
-					onChange={e => setFormData(prev => ({ ...prev, pitchId: +e.target.value as 1 | 2 }))}
+					id="mode"
+					name="mode"
+					value={formData.mode}
+					onChange={e => setFormData(prev => ({ ...prev, mode: e.target.value as "1x15" | "2x10" }))}
 					required
 				>
-					<option value="1">Boisko 1</option>
-					<option value="2">Boisko 2</option>
+					<option value="1x15">1x 15 min</option>
+					<option value="2x10">2x 10 min</option>
 				</select>
 			</div>
 
 			<div>
-				<label htmlFor="status">Status: </label>
-				<select
-					id="status"
-					name="status"
-					value={formData.status}
-					onChange={e => setFormData(prev => ({ ...prev, status: e.target.value as "scheduled" | "live" }))}
-					required
-				>
-					<option value="scheduled">Zaplanowany</option>
-					<option value="live">LIVE (rozpocznij od razu)</option>
-				</select>
-			</div>
-
-			<div>
-				<button type="submit">{isEditing ? "Zaktualizuj mecz" : "Dodaj mecz"}</button>
+				<button type="submit">Dodaj i rozpocznij mecz</button>
 			</div>
 		</form>
 	);

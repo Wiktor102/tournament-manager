@@ -16,15 +16,13 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 	return (
 		<div className="match-manager-page">
 			<h1 className="page-title">
-				Zarządzaj pojedynkiem:{" "}
+				Obecny pojedynek:{" "}
 				<span className="live-score">
 					{match.team1} vs {match.team2}
 				</span>
 			</h1>
 
 			<div className="match-detail-container">
-				<div className="match-date">Boisko #{match.pitchId}</div>
-
 				<div className="match-status">
 					Status:{" "}
 					<span className="status-value" style={{ backgroundColor: `var(--${statusColor})` }}>
@@ -41,6 +39,8 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 
 				<ExtraTimeUpdater match={match} />
 				<LiveScoreUpdater match={match} />
+				<button>Przerwa</button>
+				<button disabled={!match.resumedAt && match.mode === "2x10"}>Zakończ</button>
 			</div>
 		</div>
 	);

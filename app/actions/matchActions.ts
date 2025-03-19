@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import { v4 as uuid } from "uuid";
-import { Match, MatchData } from "../../types/types";
+import { Match, InitialMatchData } from "../../types/types";
 import { sendMatchUpdate } from "../api/events/route";
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
@@ -63,18 +63,19 @@ async function saveMatches(matches: Match[]): Promise<void> {
 }
 
 // Create a new match
-async function createMatch(formData: MatchData): Promise<Match> {
+async function createMatch(formData: InitialMatchData): Promise<Match> {
 	const matches = await readMatchesFromFile();
 
 	const newMatch: Match = {
 		id: uuid(),
 		team1: formData.homeTeam.toUpperCase(),
 		team2: formData.awayTeam.toUpperCase(),
+		mode: formData.mode,
+		rank: formData.rank,
+
 		score1: 0,
 		score2: 0,
-		pitchId: formData.pitchId,
-		status: "scheduled",
-		mode: "1x15", // TODO: Add mode to form
+		status: "live",
 		currentTime: "0",
 		addedTime: 0
 	};
@@ -87,18 +88,19 @@ async function createMatch(formData: MatchData): Promise<Match> {
 	return newMatch;
 }
 
-// Update a match
-async function updateMatch(id: string, formData: MatchData): Promise<Match> {
-	const match = await readMatchFromFile(id);
+// ----------------------------
+// ----------------------------
+// ----------------------------
+// Updates
+// ----------------------------
 
-	if (!match) {
-		throw new Error("Match not found");
-	}
+async function updateMatchTeams(id: string, team1: string, team2: string): Promise<Match> {
+	const match = await readMatchFromFile(id);
+	if (!match) throw new Error("Match not found");
 
 	const updatedMatch: Partial<Match> = {
-		team1: formData.homeTeam.toUpperCase(),
-		team2: formData.awayTeam.toUpperCase(),
-		pitchId: formData.pitchId
+		team1: team1.toUpperCase(),
+		team2: team2.toUpperCase()
 	};
 
 	return await updateMatchInFile(id, updatedMatch);
@@ -113,7 +115,6 @@ async function startMatch(id: string): Promise<Match> {
 	return await updateMatchInFile(id, update);
 }
 
-// Update match score
 async function updateMatchScore(id: string, action: { team: "team1" | "team2"; change: number }): Promise<Match> {
 	const match = await readMatchFromFile(id);
 
@@ -145,5 +146,5 @@ async function deleteMatch(formData: FormData): Promise<void> {
 }
 
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch };
-export { startMatch, updateMatchScore, updateMatchAdditionalTime };
-export { createMatch, updateMatch, deleteMatch };
+export { startMatch, updateMatchScore, updateMatchAdditionalTime, updateMatchTeams };
+export { createMatch, deleteMatch };

@@ -12,6 +12,7 @@ function StreamOverlayWidget({ initialMatch }: { initialMatch: Match }) {
 
 	return (
 		<>
+			<h3>Liga elektronika: {match.rank ?? "1/?"}</h3>
 			<div className="counter-widget widget">
 				<span className="team-name">{match.team1}</span>
 				<span className="score">

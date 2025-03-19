@@ -4,7 +4,7 @@ export interface Match {
 	team2: string;
 	status: "scheduled" | "live" | "half-time" | "finished";
 	mode: "1x15" | "2x10";
-	pitchId: 1 | 2;
+	rank: string;
 
 	score1: number;
 	score2: number;
@@ -15,12 +15,11 @@ export interface Match {
 	addedTime: number;
 }
 
-export interface MatchData {
+export interface InitialMatchData {
 	homeTeam: string;
 	awayTeam: string;
-	date: string;
-	pitchId: 1 | 2;
-	status: "scheduled" | "live";
+	rank: string;
+	mode: "1x15" | "2x10";
 }
 
 export interface MatchUpdate {
