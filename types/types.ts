@@ -8,9 +8,11 @@ export interface Match {
 
 	score1: number;
 	score2: number;
+
 	startedAt?: number;
 	resumedAt?: number;
 	currentTime?: string;
+	addedTime: number;
 }
 
 export interface MatchData {

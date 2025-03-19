@@ -38,6 +38,27 @@
 		background-color: var(--background);
 	}
 
+	.set-additional-time {
+		font-size: 1.125rem;
+		margin-bottom: 1rem;
+		color: var(--foreground);
+
+		input,
+		button {
+			padding: 0.25em 0.5em;
+			border-radius: 5px;
+			font-weight: 600;
+			border: 0;
+			text-transform: capitalize;
+			font-size: inherit;
+		}
+
+		button {
+			margin-left: 0.5rem;
+			font-weight: normal;
+		}
+	}
+
 	.live-score {
 		font-weight: bold;
 	}

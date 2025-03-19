@@ -75,7 +75,8 @@ async function createMatch(formData: MatchData): Promise<Match> {
 		pitchId: formData.pitchId,
 		status: "scheduled",
 		mode: "1x15", // TODO: Add mode to form
-		currentTime: "0"
+		currentTime: "0",
+		addedTime: 0
 	};
 
 	matches.push(newMatch);
@@ -104,7 +105,6 @@ async function updateMatch(id: string, formData: MatchData): Promise<Match> {
 }
 
 async function startMatch(id: string): Promise<Match> {
-	console.log("startMatch");
 	const match = await readMatchFromFile(id);
 	if (!match) throw new Error("Match not found");
 	if (match.status !== "scheduled") throw new Error("Match must be in the 'scheduled' state to start");
@@ -124,6 +124,13 @@ async function updateMatchScore(id: string, action: { team: "team1" | "team2"; c
 	return updatedMatch;
 }
 
+async function updateMatchAdditionalTime(id: string, addedTime: number): Promise<Match> {
+	const match = await readMatchFromFile(id);
+	if (!match) throw new Error("Match not found");
+	const updatedMatch = await updateMatchInFile(id, { addedTime });
+	return updatedMatch;
+}
+
 // Delete a match
 async function deleteMatch(formData: FormData): Promise<void> {
 	const matchId = formData.get("matchId")! as string;
@@ -138,5 +145,5 @@ async function deleteMatch(formData: FormData): Promise<void> {
 }
 
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch };
-export { startMatch, updateMatchScore };
+export { startMatch, updateMatchScore, updateMatchAdditionalTime };
 export { createMatch, updateMatch, deleteMatch };

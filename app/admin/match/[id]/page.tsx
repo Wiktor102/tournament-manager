@@ -4,6 +4,7 @@ import "./MatchManagerPage.scss";
 import { getMatchStatus } from "@/lib/matchUtils";
 import LiveScoreUpdater from "@/components/ScoreUpdater/ScoreUpdater";
 import MatchTimer from "@/components/MatchTimer";
+import ExtraTimeUpdater from "@/components/ExtraTimeUpdater/ExtraTimeUpdater";
 
 async function MatchManagerPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
@@ -38,6 +39,7 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 					</span>
 				</div>
 
+				<ExtraTimeUpdater match={match} />
 				<LiveScoreUpdater match={match} />
 			</div>
 		</div>
