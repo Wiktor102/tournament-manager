@@ -72,7 +72,7 @@ function StreamOverlayWidget({
 				</span>
 				<span className="team-name">{match.team2}</span>
 			</div>
-			<div className="timer-widget widget">
+			<div className="timer-widget widget" suppressHydrationWarning>
 				<MatchTimer match={match} />
 			</div>
 		</>

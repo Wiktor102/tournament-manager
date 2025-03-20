@@ -42,10 +42,10 @@ function useLiveMatch(initialMatch: Match, isCurrent: boolean = false) {
 				// This specific match was deleted
 				setIsDeleted(true);
 				// Add a deleted flag to the match
-				setMatch({
-					...match,
+				setMatch(prevMatch => ({
+					...prevMatch,
 					_deleted: true
-				});
+				}));
 			}
 			// For "current" mode, we'll automatically receive the next match or placeholder
 		});
@@ -85,9 +85,7 @@ function useLiveMatch(initialMatch: Match, isCurrent: boolean = false) {
 		};
 
 		return cleanUp;
-	}, [initialMatch.id, isCurrent, isPlaceholder, match]);
-
-	//! DEBUG ABOVE EFFECT
+	}, [initialMatch.id, isCurrent, isPlaceholder]);
 
 	return { match, isDeleted };
 }
