@@ -31,7 +31,7 @@ function useLiveMatch(initialMatch: Match, isCurrent: boolean = false) {
 		// Regular updates
 		eventSourceRef.current.onmessage = (event: MessageEvent) => {
 			const updatedMatch: Match = JSON.parse(event.data);
-			if (updatedMatch && updatedMatch.id !== "placeholder") setMatch(updatedMatch);
+			if (updatedMatch) setMatch(updatedMatch);
 		};
 
 		// Handle match deletion events

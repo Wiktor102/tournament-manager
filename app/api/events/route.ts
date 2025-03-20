@@ -42,6 +42,7 @@ export async function sendMatchDeleteUpdate(matchId: string) {
 			// Send a deletion event
 			controller.enqueue(encoder.encode(`event: matchDeleted\ndata: ${matchId}\n\n`));
 		} else if (key.endsWith("#current")) {
+			console.log("next", nextCurrentMatch);
 			if (nextCurrentMatch) {
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(nextCurrentMatch)}\n\n`));
 			} else {
