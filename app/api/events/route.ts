@@ -42,7 +42,6 @@ export async function sendMatchDeleteUpdate(matchId: string) {
 			// Send a deletion event
 			controller.enqueue(encoder.encode(`event: matchDeleted\ndata: ${matchId}\n\n`));
 		} else if (key.endsWith("#current")) {
-			console.log("next", nextCurrentMatch);
 			if (nextCurrentMatch) {
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(nextCurrentMatch)}\n\n`));
 			} else {
@@ -144,24 +143,12 @@ export async function GET(request: NextRequest) {
 
 	const stream = new ReadableStream({
 		start(controller) {
-			const connectionId = addConnection(initialMatchId, controller);
-
-			// Send initial match data
+			addConnection(initialMatchId, controller);
 			controller.enqueue(encoder.encode(`data: ${JSON.stringify(match)}\n\n`));
-
-			// Auto-cleanup connection after a while (e.g., 2 hours)
-			setTimeout(() => {
-				removeConnection(connectionId);
-				controller.close();
-			}, 2 * 60 * 60 * 1000); // 2 hours
 		},
 		cancel() {
-			// Connection was closed
 			const connectionIds = Array.from(connections.keys()).filter(key => key.endsWith(`#${initialMatchId}`));
-
-			for (const id of connectionIds) {
-				removeConnection(id);
-			}
+			for (const id of connectionIds) removeConnection(id);
 		}
 	});
 
