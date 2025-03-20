@@ -1,0 +1,92 @@
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	font-family: inherit;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	cursor: pointer;
+	border: none;
+	outline: none;
+
+	&:focus-visible {
+		outline: 2px solid var(--color-blue-500);
+		outline-offset: 2px;
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	// Size variations
+	&--default {
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+	}
+
+	&--sm {
+		padding: 0.25rem 0.75rem;
+		font-size: 0.75rem;
+	}
+
+	&--lg {
+		padding: 0.75rem 1.5rem;
+		font-size: 1rem;
+	}
+
+	&--icon {
+		padding: 0.5rem;
+	}
+
+	// Variant styles
+	&--default,
+	&--primary {
+		background-color: var(--button-edit);
+		color: var(--color-white);
+
+		&:hover:not(:disabled) {
+			background-color: var(--button-edit-hover);
+		}
+	}
+
+	&--secondary {
+		background-color: var(--color-gray-200);
+		color: var(--foreground);
+
+		&:hover:not(:disabled) {
+			background-color: var(--color-gray-300);
+		}
+	}
+
+	&--outline {
+		background-color: transparent;
+		color: var(--foreground);
+		border: 1px solid var(--section-border);
+
+		&:hover:not(:disabled) {
+			background-color: var(--color-gray-100);
+		}
+	}
+
+	&--destructive {
+		background-color: var(--button-delete);
+		color: var(--color-white);
+
+		&:hover:not(:disabled) {
+			background-color: var(--button-delete-hover);
+		}
+	}
+
+	&--link {
+		background-color: transparent;
+		color: var(--button-edit);
+		text-decoration: underline;
+		text-underline-offset: 4px;
+
+		&:hover:not(:disabled) {
+			color: var(--link-hover);
+		}
+	}
+}
