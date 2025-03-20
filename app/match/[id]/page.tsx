@@ -17,9 +17,6 @@ export default async function StreamOverlay({ params }: { params: Promise<{ id: 
 		return (
 			<div className="stream-overlay">
 				<StreamOverlayWidget initialMatch={initialMatch} isCurrent={true} noMatchAvailable={!initialMatch} />
-				<Link href="/" className="return-home">
-					Powrót do strony głównej
-				</Link>
 			</div>
 		);
 	}

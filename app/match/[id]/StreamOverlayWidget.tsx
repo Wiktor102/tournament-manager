@@ -37,7 +37,7 @@ function StreamOverlayWidget({
 	const [hasMatch, setHasMatch] = useState(!noMatchAvailable);
 
 	useEffect(() => {
-		if (noMatchAvailable && match.id !== "placeholder") setHasMatch(true);
+		setHasMatch(noMatchAvailable && match.id !== "placeholder");
 	}, [match.id, noMatchAvailable]);
 
 	// Show deleted state if match was deleted and we're not in "current" mode
@@ -54,11 +54,12 @@ function StreamOverlayWidget({
 	// Show empty state if no match available
 	if ((noMatchAvailable && !hasMatch) || match.id === "placeholder") {
 		return (
-			<div className="no-match-placeholder">
+			<>
 				<h3>Liga elektronika</h3>
-				<p>Brak aktywnego meczu</p>
-				<p className="waiting-text">Oczekiwanie na rozpoczęcie meczu...</p>
-			</div>
+				<div className="counter-widget widget no-match-widget">
+					<span className="no-match-text">brak meczu</span>
+				</div>
+			</>
 		);
 	}
 
