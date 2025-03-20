@@ -8,6 +8,7 @@ import ExtraTimeUpdater from "@/components/ExtraTimeUpdater/ExtraTimeUpdater";
 import EndMatchButton from "@/components/EndMatchButton/EndMatchButton";
 import BreakButton from "@/components/BreakButton/BreakButton";
 import PenaltyButton from "@/components/PenaltyButton/PenaltyButton";
+import StartMatchButton from "@/components/StartMatchButton/StartMatchButton";
 
 async function MatchManagerPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
@@ -46,6 +47,7 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 				<LiveScoreUpdater match={match} />
 
 				<div className="buttons">
+					{match.status === "scheduled" && <StartMatchButton match={match} />}
 					{!match.resumedAt && match.mode === "2x10" && <BreakButton match={match} />}
 					{match.status === "live" && (match.resumedAt || match.mode === "1x15") && (
 						<PenaltyButton match={match} />

@@ -78,7 +78,7 @@ async function createMatch(formData: InitialMatchData): Promise<Match> {
 
 		score1: 0,
 		score2: 0,
-		status: "live",
+		status: "scheduled",
 		currentTime: "0",
 		addedTime: 0
 	};
@@ -155,7 +155,8 @@ async function startBreak(id: string): Promise<Match> {
 	if (!match) throw new Error("Match not found");
 
 	const updatedMatch: Partial<Match> = {
-		status: "half-time"
+		status: "half-time",
+		addedTime: 0
 	};
 
 	return await updateMatchInFile(id, updatedMatch);

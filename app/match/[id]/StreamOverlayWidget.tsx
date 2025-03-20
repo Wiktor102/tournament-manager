@@ -67,9 +67,9 @@ function StreamOverlayWidget({
 		return (
 			<>
 				<h3>Liga elektronika</h3>
-				<div className="counter-widget widget no-match-widget">
+				{/* <div className="counter-widget widget no-match-widget">
 					<span className="no-match-text">brak meczu</span>
-				</div>
+				</div> */}
 			</>
 		);
 	}

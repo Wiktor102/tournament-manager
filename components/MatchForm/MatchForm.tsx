@@ -41,7 +41,7 @@ export default function MatchForm() {
 					name="homeTeam"
 					value={formData.homeTeam}
 					onChange={handleChange}
-					className="w-full p-2 border rounded"
+					autoComplete="off"
 					required
 				/>
 
@@ -53,7 +53,7 @@ export default function MatchForm() {
 					name="awayTeam"
 					value={formData.awayTeam}
 					onChange={handleChange}
-					className="w-full p-2 border rounded"
+					autoComplete="off"
 					required
 				/>
 			</div>
@@ -90,7 +90,7 @@ export default function MatchForm() {
 			</div>
 
 			<div>
-				<button type="submit">Dodaj i rozpocznij mecz</button>
+				<button type="submit">Dodaj mecz</button>
 			</div>
 		</form>
 	);
