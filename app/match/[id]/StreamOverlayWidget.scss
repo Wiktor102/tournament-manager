@@ -41,3 +41,21 @@ h3 {
 	color: white;
 	font-style: italic;
 }
+
+/* Added animation for winning teams */
+@keyframes playfulBounce {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.1);
+	}
+}
+
+.winning-team1,
+.winning-team2 {
+	animation: playfulBounce 1s infinite;
+	border: 2px solid #ffd700; // gold border
+	border-radius: 10rem;
+}

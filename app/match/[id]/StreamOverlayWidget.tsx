@@ -40,6 +40,17 @@ function StreamOverlayWidget({
 		setHasMatch(noMatchAvailable && match.id !== "placeholder");
 	}, [match.id, noMatchAvailable]);
 
+	// New: determine if match is finished & the winning team
+	const isFinished = match.status === "finished";
+	let winnerClass = "";
+	if (isFinished) {
+		if (match.score1 > match.score2) {
+			winnerClass = "winning-team1";
+		} else if (match.score2 > match.score1) {
+			winnerClass = "winning-team2";
+		}
+	}
+
 	// Show deleted state if match was deleted and we're not in "current" mode
 	if (isDeleted && !isCurrent) {
 		return (
@@ -68,13 +79,13 @@ function StreamOverlayWidget({
 			<h3>Liga elektronika: {match.rank ?? "1/?"}</h3>
 			<div className="counter-widget widget">
 				<span className="team-name">{match.team1}</span>
-				<span className="score">
+				<span className={`score ${winnerClass}`}>
 					{match.score1} : {match.score2}
 				</span>
 				<span className="team-name">{match.team2}</span>
 			</div>
 			<div className="timer-widget widget" suppressHydrationWarning>
-				<MatchTimer match={match} />
+				{isFinished ? <span className="finished-timer">zakończony</span> : <MatchTimer match={match} />}
 			</div>
 		</>
 	);

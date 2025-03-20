@@ -9,7 +9,6 @@ declare let global: {
 // Initialize the global connection store if it doesn't exist
 if (!global.connectionStore) {
 	global.connectionStore = new Map<string, ReadableStreamController<Uint8Array>>();
-	console.log("Initialized global connection store");
 }
 
 // Add a connection for a match
@@ -38,13 +37,16 @@ export function getConnections() {
 // Send update to all connections for a match
 export async function sendMatchUpdate(matchId: string, data: Match, isCurrentMatchFn: (match: Match) => Promise<boolean>) {
 	const connections = getConnections();
-	console.log("sendMatchUpdate called, connections:", connections.size, "keys:", Array.from(connections.keys()));
+	// console.log("sendMatchUpdate called, connections:", connections.size, "keys:", Array.from(connections.keys()));
 
 	// Send to specific match listeners
 	for (const [key, controller] of connections.entries()) {
 		try {
-			// Send to both specific match listeners and "current" listeners if this is the current match
-			if (key.endsWith(`#${matchId}`) || (key.endsWith("#current") && (await isCurrentMatchFn(data)))) {
+			// Send to both specific match listeners and "current" listeners.
+			if (
+				key.endsWith(`#${matchId}`) ||
+				(key.endsWith("#current") && ((await isCurrentMatchFn(data)) || data.status === "finished"))
+			) {
 				const encoder = new TextEncoder();
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
 			}
