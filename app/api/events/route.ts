@@ -1,27 +1,15 @@
+"use server";
+
 import { getMatch, getMatches } from "@/app/actions/matchActions";
 import { Match } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
-import { v4 as uuid } from "uuid";
-
-// Connection store - in a real app, use Redis or similar
-const connections = new Map<string, ReadableStreamController<Uint8Array>>();
-
-// Add a connection for a match
-export function addConnection(matchId: string, controller: ReadableStreamController<Uint8Array>): string {
-	const id = `${uuid()}#${matchId}`;
-	connections.set(id, controller);
-	return id;
-}
-
-// Remove a connection
-export function removeConnection(connectionId: string) {
-	connections.delete(connectionId);
-}
+import { addConnection, removeConnection, getConnections } from "@/app/lib/connectionsStore";
 
 // Send update to all connections for a match
 export async function sendMatchUpdate(matchId: string, data: Match) {
+	console.log(getConnections());
 	// Send to specific match listeners
-	for (const [key, controller] of connections.entries()) {
+	for (const [key, controller] of getConnections().entries()) {
 		// Send to both specific match listeners and "current" listeners if this is the current match
 		if (key.endsWith(`#${matchId}`) || (key.endsWith("#current") && (await isCurrentMatch(data)))) {
 			const encoder = new TextEncoder();
@@ -35,6 +23,7 @@ export async function sendMatchDeleteUpdate(matchId: string) {
 	// Get the new current match (if any)
 	const nextCurrentMatch = await getCurrentLiveMatch();
 	const encoder = new TextEncoder();
+	const connections = getConnections();
 
 	for (const [key, controller] of connections.entries()) {
 		if (key.endsWith(`#${matchId}`)) {
@@ -147,7 +136,7 @@ export async function GET(request: NextRequest) {
 			controller.enqueue(encoder.encode(`data: ${JSON.stringify(match)}\n\n`));
 		},
 		cancel() {
-			const connectionIds = Array.from(connections.keys()).filter(key => key.endsWith(`#${initialMatchId}`));
+			const connectionIds = Array.from(getConnections().keys()).filter(key => key.endsWith(`#${initialMatchId}`));
 			for (const id of connectionIds) removeConnection(id);
 		}
 	});
@@ -160,3 +149,6 @@ export async function GET(request: NextRequest) {
 		}
 	});
 }
+
+// Export the isCurrentMatch function for use in the match actions
+export { isCurrentMatch };

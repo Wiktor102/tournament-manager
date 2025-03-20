@@ -5,7 +5,8 @@ import fs from "fs/promises";
 import path from "path";
 import { v4 as uuid } from "uuid";
 import { Match, InitialMatchData } from "../../types/types";
-import { sendMatchDeleteUpdate, sendMatchUpdate } from "../api/events/route";
+import { isCurrentMatch, sendMatchDeleteUpdate } from "../api/events/route";
+import { sendMatchUpdate } from "@/app/lib/connectionsStore";
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
 
@@ -46,7 +47,7 @@ async function updateMatchInFile(id: string, update: Partial<Match>): Promise<Ma
 	revalidatePath(`/match/${id}`);
 	revalidatePath("/match/current"); // Add revalidation for current path
 
-	sendMatchUpdate(id, updatedMatch);
+	sendMatchUpdate(id, updatedMatch, isCurrentMatch);
 
 	return updatedMatch;
 }
@@ -84,7 +85,7 @@ async function createMatch(formData: InitialMatchData): Promise<Match> {
 
 	matches.push(newMatch);
 	await saveMatches(matches);
-	sendMatchUpdate(newMatch.id, newMatch);
+	sendMatchUpdate(newMatch.id, newMatch, isCurrentMatch);
 
 	revalidatePath("/admin");
 	revalidatePath("/");
