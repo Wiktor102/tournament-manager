@@ -25,10 +25,10 @@ export default function ScoreUpdater({ match }: { match: Match }) {
 		}
 
 		startTransition(async () => {
-			changeOptimisticScore({ team, change });
 			try {
 				const updatedMatch = await updateMatchScore(match.id, { team, change });
 				setRealScore({ team1: updatedMatch.score1, team2: updatedMatch.score2 });
+				changeOptimisticScore({ team, change });
 			} catch (error) {
 				console.error("Error updating score:", error);
 				setRealScore(realScore);
