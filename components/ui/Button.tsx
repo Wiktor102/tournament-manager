@@ -4,7 +4,7 @@ import React, { ButtonHTMLAttributes, forwardRef } from "react";
 import "./Button.scss";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: "default" | "primary" | "secondary" | "outline" | "destructive" | "link";
+	variant?: "default" | "primary" | "outline" | "destructive" | "link";
 	size?: "default" | "sm" | "lg" | "icon";
 }
 

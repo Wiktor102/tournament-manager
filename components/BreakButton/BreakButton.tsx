@@ -3,6 +3,7 @@
 import { startBreak, resumeFromBreak } from "@/app/actions/matchActions";
 import { Match } from "@/types/types";
 import { useTransition } from "react";
+import { Button } from "../ui/button";
 
 function BreakButton({ match }: { match: Match }) {
 	const [isPending, startTransition] = useTransition();
@@ -35,9 +36,9 @@ function BreakButton({ match }: { match: Match }) {
 	}
 
 	return (
-		<button onClick={handleBreakAction} disabled={isDisabled}>
+		<Button variant={"primary"} onClick={handleBreakAction} disabled={isDisabled}>
 			{buttonText}
-		</button>
+		</Button>
 	);
 }
 

@@ -45,7 +45,8 @@ export async function sendMatchUpdate(matchId: string, data: Match, isCurrentMat
 			// Send to both specific match listeners and "current" listeners.
 			if (
 				key.endsWith(`#${matchId}`) ||
-				(key.endsWith("#current") && ((await isCurrentMatchFn(data)) || data.status === "finished"))
+				(key.endsWith("#current") &&
+					((await isCurrentMatchFn(data)) || data.status === "finished" || data.status === "penalties"))
 			) {
 				const encoder = new TextEncoder();
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));

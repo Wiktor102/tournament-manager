@@ -4,6 +4,7 @@ import { endMatch } from "@/app/actions/matchActions";
 import { Match } from "@/types/types";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { Button } from "../ui/button";
 
 function EndMatchButton({ match }: { match: Match }) {
 	const [isPending, startTransition] = useTransition();
@@ -19,9 +20,13 @@ function EndMatchButton({ match }: { match: Match }) {
 	};
 
 	return (
-		<button onClick={handleEndMatch} disabled={(!match.resumedAt && match.mode === "2x10") || isPending}>
+		<Button
+			variant="destructive"
+			onClick={handleEndMatch}
+			disabled={(!match.resumedAt && match.mode === "2x10") || isPending}
+		>
 			{isPending ? "Kończenie..." : "Zakończ"}
-		</button>
+		</Button>
 	);
 }
 

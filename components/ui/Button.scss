@@ -51,15 +51,6 @@
 		}
 	}
 
-	&--secondary {
-		background-color: var(--color-gray-200);
-		color: var(--foreground);
-
-		&:hover:not(:disabled) {
-			background-color: var(--color-gray-300);
-		}
-	}
-
 	&--outline {
 		background-color: transparent;
 		color: var(--foreground);
