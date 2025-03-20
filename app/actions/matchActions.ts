@@ -215,6 +215,20 @@ async function deleteMatch(formData: FormData): Promise<void> {
 	}
 }
 
+export async function startPenalties(matchId: string) {
+	try {
+		const updated = await updateMatchInFile(matchId, {
+			status: "penalties"
+		});
+
+		sendMatchUpdate(matchId, updated, isCurrentMatch);
+		return { success: true };
+	} catch (error) {
+		console.error("Error starting penalties:", error);
+		return { success: false, error };
+	}
+}
+
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch, getCurrentLiveMatch };
 export { startMatch, updateMatchScore, updateMatchAdditionalTime, updateMatchTeams, endMatch, startBreak, resumeFromBreak };
 export { createMatch, deleteMatch };

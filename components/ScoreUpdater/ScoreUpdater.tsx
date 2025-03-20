@@ -38,7 +38,7 @@ export default function ScoreUpdater({ match }: { match: Match }) {
 
 	return (
 		<>
-			<form className="score-updater" action="" inert={match.status !== "live"}>
+			<form className="score-updater" action="" inert={!["live", "penalties"].includes(match.status)}>
 				<div className="manipulate-score">
 					<button onClick={e => handleScoreUpdateClick(e, "team1", 1)}>+</button>
 					<button onClick={e => handleScoreUpdateClick(e, "team1", -1)}>-</button>

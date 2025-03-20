@@ -8,6 +8,8 @@ function getMatchStatus(match: Match): [string, string] {
 			return ["LIVE", "button-live-score"];
 		case "half-time":
 			return ["Przerwa", "link-hover"];
+		case "penalties":
+			return ["Rzuty karne", "button-live-score"];
 		case "finished":
 			return ["Zakończony", "background"];
 	}

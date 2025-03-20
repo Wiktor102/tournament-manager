@@ -2,7 +2,7 @@ export interface Match {
 	id: string;
 	team1: string;
 	team2: string;
-	status: "scheduled" | "live" | "half-time" | "finished";
+	status: "scheduled" | "live" | "half-time" | "finished" | "penalties";
 	mode: "1x15" | "2x10";
 	rank: string;
 
@@ -26,7 +26,7 @@ export interface InitialMatchData {
 export interface MatchUpdate {
 	scoreHome?: number;
 	scoreAway?: number;
-	status?: "scheduled" | "live" | "finished";
+	status?: "scheduled" | "live" | "penalties" | "finished";
 	currentTime?: string;
 	isLive?: boolean;
 }

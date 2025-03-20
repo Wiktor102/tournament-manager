@@ -7,6 +7,7 @@ import MatchTimer from "@/components/MatchTimer";
 import ExtraTimeUpdater from "@/components/ExtraTimeUpdater/ExtraTimeUpdater";
 import EndMatchButton from "@/components/EndMatchButton/EndMatchButton";
 import BreakButton from "@/components/BreakButton/BreakButton";
+import PenaltyButton from "@/components/PenaltyButton/PenaltyButton";
 
 async function MatchManagerPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
@@ -47,6 +48,9 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 				<div className="buttons">
 					{!match.resumedAt && match.mode === "2x10" && <BreakButton match={match} />}
 					{match.status === "live" && (match.resumedAt || match.mode === "1x15") && (
+						<PenaltyButton match={match} />
+					)}
+					{["live", "penalties"].includes(match.status) && (match.resumedAt || match.mode === "1x15") && (
 						<EndMatchButton match={match} />
 					)}
 				</div>

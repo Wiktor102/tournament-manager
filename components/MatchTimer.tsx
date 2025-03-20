@@ -24,10 +24,8 @@ function MatchTimer({ match }: { match: Match }) {
 		return () => clearInterval(interval);
 	}, [match.resumedAt, match.startedAt, match.status]);
 
-	// Return "przerwa" during half-time
 	if (match.status === "half-time") return "przerwa";
-
-	// Return null for other non-live, non-finished statuses
+	if (match.status === "penalties") return "Rzuty karne";
 	if (match.status !== "live" && match.status !== "finished") return null;
 
 	const minutes = Math.floor(currentTime / 60000);

@@ -5,19 +5,6 @@ import { Match } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 import { addConnection, removeConnection, getConnections } from "@/app/lib/connectionsStore";
 
-// Send update to all connections for a match
-export async function sendMatchUpdate(matchId: string, data: Match) {
-	console.log(getConnections());
-	// Send to specific match listeners
-	for (const [key, controller] of getConnections().entries()) {
-		// Send to both specific match listeners and "current" listeners if this is the current match
-		if (key.endsWith(`#${matchId}`) || (key.endsWith("#current") && (await isCurrentMatch(data)))) {
-			const encoder = new TextEncoder();
-			controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-		}
-	}
-}
-
 // Send update to all connections when a match is deleted
 export async function sendMatchDeleteUpdate(matchId: string) {
 	// Get the new current match (if any)
@@ -55,7 +42,9 @@ export async function sendMatchDeleteUpdate(matchId: string) {
 // Function to check if a match is the current (most recent live) match
 async function isCurrentMatch(match: Match): Promise<boolean> {
 	const matches = await getMatches();
-	const liveMatches = matches.filter(m => m.status === "live" || match.status === "half-time");
+	const liveMatches = matches.filter(
+		m => m.status === "live" || match.status === "half-time" || match.status === "penalties"
+	);
 
 	if (liveMatches.length === 0) return false;
 
@@ -73,7 +62,9 @@ async function isCurrentMatch(match: Match): Promise<boolean> {
 // Get current live match
 async function getCurrentLiveMatch(): Promise<Match | undefined> {
 	const matches = await getMatches();
-	const liveMatches = matches.filter(match => match.status === "live" || match.status === "half-time");
+	const liveMatches = matches.filter(
+		match => match.status === "live" || match.status === "half-time" || match.status === "penalties"
+	);
 
 	if (liveMatches.length === 0) {
 		return undefined;
