@@ -6,18 +6,17 @@ import DeleteMatch from "./DeleteMatch";
 
 function MatchesList({ matches }: { matches: Match[] }) {
 	if (matches.length == 0) return <p className="empty-state">Brak meczów</p>;
+	matches.reverse();
 
 	return (
 		<ul>
 			{matches.map(match => (
 				<li key={match.id} className="match-item">
 					<div>
+						<div className="match-rank">{match.rank}</div>
 						<div className="match-teams">
 							{match.team1} vs {match.team2}
 						</div>
-						{match.status == "live" && (
-							<div className="match-details">{new Date(match.currentTime!).toLocaleString()}</div>
-						)}
 						<div className="match-status">
 							Status:{" "}
 							<span className="status-value">

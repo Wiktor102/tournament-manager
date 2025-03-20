@@ -48,30 +48,30 @@
 		&:last-child {
 			border-bottom: none;
 		}
-	}
 
-	.match-teams {
-		font-weight: bold;
-		color: var(--foreground);
-	}
-
-	.match-details {
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-	}
-
-	.match-status {
-		font-size: 0.875rem;
-		color: var(--text-secondary);
-
-		.status-value {
-			text-transform: capitalize;
+		.match-rank {
+			font-size: 0.9rem;
+			font-style: italic;
 		}
-	}
 
-	.actions-container {
-		display: flex;
-		gap: 0.5rem;
+		.match-teams {
+			font-weight: bold;
+			color: var(--foreground);
+		}
+
+		.match-status {
+			font-size: 0.875rem;
+			color: var(--text-secondary);
+
+			.status-value {
+				text-transform: capitalize;
+			}
+		}
+
+		.actions-container {
+			display: flex;
+			gap: 0.5rem;
+		}
 	}
 
 	.button {

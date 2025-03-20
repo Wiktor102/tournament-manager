@@ -1,19 +1,19 @@
-// Client component for the end match button
 "use client";
 
 import { endMatch } from "@/app/actions/matchActions";
 import { Match } from "@/types/types";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 
 function EndMatchButton({ match }: { match: Match }) {
 	const [isPending, startTransition] = useTransition();
+	const router = useRouter();
 
 	const handleEndMatch = () => {
 		if (window.confirm("Czy na pewno chcesz zakończyć ten mecz?")) {
 			startTransition(async () => {
 				await endMatch(match.id);
-				redirect("/admin");
+				router.push("/admin");
 			});
 		}
 	};

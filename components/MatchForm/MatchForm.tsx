@@ -24,12 +24,9 @@ export default function MatchForm() {
 
 	const handleSubmit = async () => {
 		try {
-			await createMatch(formData);
+			const createdMatch = await createMatch(formData);
 			setFormData(initialData); // Clear form
-
-			// Router refresh happens automatically because of revalidatePath
-			// in the server action, but it doesn't hurt to call it again
-			router.refresh();
+			router.push(`/admin/match/${createdMatch.id}`);
 		} catch (error) {
 			console.error("Error submitting form:", error);
 		}
@@ -63,14 +60,20 @@ export default function MatchForm() {
 
 			<div>
 				<label htmlFor="rank">Ranga rozgrywki: </label>
-				<input
+				<select
 					id="rank"
 					name="rank"
 					value={formData.rank}
-					placeholder="np. 1/16"
 					onChange={e => setFormData(prev => ({ ...prev, rank: e.target.value }))}
 					required
-				/>
+				>
+					<option value="1/16">1/16</option>
+					<option value="1/8">1/8</option>
+					<option value="1/4">1/4</option>
+					<option value="1/2">1/2</option>
+					<option value="Finał">Finał</option>
+					<option value="O 3 miejsce">O 3 miejsce</option>
+				</select>
 			</div>
 			<div>
 				<label htmlFor="mode">Tryb rozgrywki: </label>
