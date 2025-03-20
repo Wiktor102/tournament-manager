@@ -67,7 +67,7 @@ export async function sendMatchDeleteUpdate(matchId: string) {
 // Function to check if a match is the current (most recent live) match
 async function isCurrentMatch(match: Match): Promise<boolean> {
 	const matches = await getMatches();
-	const liveMatches = matches.filter(m => m.status === "live");
+	const liveMatches = matches.filter(m => m.status === "live" || match.status === "half-time");
 
 	if (liveMatches.length === 0) return false;
 
@@ -85,7 +85,7 @@ async function isCurrentMatch(match: Match): Promise<boolean> {
 // Get current live match
 async function getCurrentLiveMatch(): Promise<Match | undefined> {
 	const matches = await getMatches();
-	const liveMatches = matches.filter(match => match.status === "live");
+	const liveMatches = matches.filter(match => match.status === "live" || match.status === "half-time");
 
 	if (liveMatches.length === 0) {
 		return undefined;

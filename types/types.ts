@@ -11,6 +11,7 @@ export interface Match {
 
 	startedAt?: number;
 	resumedAt?: number;
+	endedAt?: number;
 	currentTime?: string;
 	addedTime: number;
 }

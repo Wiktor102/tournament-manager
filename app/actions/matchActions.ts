@@ -137,6 +137,41 @@ async function updateMatchAdditionalTime(id: string, addedTime: number): Promise
 	return updatedMatch;
 }
 
+async function endMatch(id: string): Promise<Match> {
+	const match = await readMatchFromFile(id);
+	if (!match) throw new Error("Match not found");
+
+	const updatedMatch: Partial<Match> = {
+		status: "finished",
+		endedAt: Date.now()
+	};
+
+	return await updateMatchInFile(id, updatedMatch);
+}
+
+async function startBreak(id: string): Promise<Match> {
+	const match = await readMatchFromFile(id);
+	if (!match) throw new Error("Match not found");
+
+	const updatedMatch: Partial<Match> = {
+		status: "half-time"
+	};
+
+	return await updateMatchInFile(id, updatedMatch);
+}
+
+async function resumeFromBreak(id: string): Promise<Match> {
+	const match = await readMatchFromFile(id);
+	if (!match) throw new Error("Match not found");
+
+	const updatedMatch: Partial<Match> = {
+		status: "live",
+		resumedAt: Date.now()
+	};
+
+	return await updateMatchInFile(id, updatedMatch);
+}
+
 // Get the most recent live match
 async function getCurrentLiveMatch(): Promise<Match | undefined> {
 	const matches = await readMatchesFromFile();
@@ -180,5 +215,5 @@ async function deleteMatch(formData: FormData): Promise<void> {
 }
 
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch, getCurrentLiveMatch };
-export { startMatch, updateMatchScore, updateMatchAdditionalTime, updateMatchTeams };
+export { startMatch, updateMatchScore, updateMatchAdditionalTime, updateMatchTeams, endMatch, startBreak, resumeFromBreak };
 export { createMatch, deleteMatch };

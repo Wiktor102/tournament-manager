@@ -5,6 +5,8 @@ import { getMatchStatus } from "@/lib/matchUtils";
 import LiveScoreUpdater from "@/components/ScoreUpdater/ScoreUpdater";
 import MatchTimer from "@/components/MatchTimer";
 import ExtraTimeUpdater from "@/components/ExtraTimeUpdater/ExtraTimeUpdater";
+import EndMatchButton from "@/components/EndMatchButton/EndMatchButton";
+import BreakButton from "@/components/BreakButton/BreakButton";
 
 async function MatchManagerPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
@@ -30,17 +32,24 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 					</span>
 				</div>
 
-				<div className="match-time">
-					Czas:{" "}
-					<span className="time-value" suppressHydrationWarning>
-						<MatchTimer match={match} />
-					</span>
-				</div>
+				{match.status === "live" && (
+					<div className="match-time">
+						Czas:{" "}
+						<span className="time-value" suppressHydrationWarning>
+							<MatchTimer match={match} />
+						</span>
+					</div>
+				)}
 
 				<ExtraTimeUpdater match={match} />
 				<LiveScoreUpdater match={match} />
-				<button>Przerwa</button>
-				<button disabled={!match.resumedAt && match.mode === "2x10"}>Zakończ</button>
+
+				<div className="buttons">
+					{!match.resumedAt && match.mode === "2x10" && <BreakButton match={match} />}
+					{match.status === "live" && (match.resumedAt || match.mode === "1x15") && (
+						<EndMatchButton match={match} />
+					)}
+				</div>
 			</div>
 		</div>
 	);
