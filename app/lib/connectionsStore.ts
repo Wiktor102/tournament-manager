@@ -1,5 +1,6 @@
 import { v4 as uuid } from "uuid";
 import { Match } from "@/types/types";
+import { getCurrentLiveMatch } from "../actions/matchActions";
 
 // Define a type for our global store
 declare let global: {
@@ -55,6 +56,40 @@ export async function sendMatchUpdate(matchId: string, data: Match, isCurrentMat
 			console.error("Error sending update to connection", key, error);
 			// Remove failed connections
 			removeConnection(key);
+		}
+	}
+}
+
+// Send update to all connections when a match is deleted
+export async function sendMatchDeleteUpdate(matchId: string) {
+	// Get the new current match (if any)
+	const nextCurrentMatch = await getCurrentLiveMatch();
+	const encoder = new TextEncoder();
+	const connections = getConnections();
+
+	for (const [key, controller] of connections.entries()) {
+		if (key.endsWith(`#${matchId}`)) {
+			// For connections listening to the specific deleted match
+			// Send a deletion event
+			controller.enqueue(encoder.encode(`event: matchDeleted\ndata: ${matchId}\n\n`));
+		} else if (key.endsWith("#current")) {
+			if (nextCurrentMatch) {
+				controller.enqueue(encoder.encode(`data: ${JSON.stringify(nextCurrentMatch)}\n\n`));
+			} else {
+				const placeholder = {
+					id: "placeholder",
+					team1: "",
+					team2: "",
+					score1: 0,
+					score2: 0,
+					mode: "1x15",
+					rank: "1/?",
+					status: "scheduled",
+					currentTime: "0",
+					addedTime: 0
+				};
+				controller.enqueue(encoder.encode(`data: ${JSON.stringify(placeholder)}\n\n`));
+			}
 		}
 	}
 }

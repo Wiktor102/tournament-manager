@@ -2,7 +2,7 @@
 
 import { Match } from "@/types/types";
 import { startPenalties } from "@/app/actions/matchActions";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 
 interface PenaltyButtonProps {
 	match: Match;

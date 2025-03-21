@@ -4,7 +4,7 @@ import { endMatch } from "@/app/actions/matchActions";
 import { Match } from "@/types/types";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 
 function EndMatchButton({ match }: { match: Match }) {
 	const [isPending, startTransition] = useTransition();

@@ -9,7 +9,7 @@ interface LiveMatchScoreProps {
 }
 
 export default function LiveMatchScore({ match: initialMatch }: LiveMatchScoreProps) {
-	const match = useLiveMatch(initialMatch);
+	const { match } = useLiveMatch(initialMatch);
 	const [statusText, statusColor] = getMatchStatus(match);
 
 	return (

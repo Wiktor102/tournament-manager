@@ -3,7 +3,7 @@
 import { startMatch } from "@/app/actions/matchActions";
 import { Match } from "@/types/types";
 import { useTransition } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 
 interface StartMatchButtonProps {
 	match: Match;

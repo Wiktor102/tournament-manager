@@ -3,7 +3,7 @@
 import { startBreak, resumeFromBreak } from "@/app/actions/matchActions";
 import { Match } from "@/types/types";
 import { useTransition } from "react";
-import { Button } from "../ui/button";
+import { Button } from "../ui/Button";
 
 function BreakButton({ match }: { match: Match }) {
 	const [isPending, startTransition] = useTransition();

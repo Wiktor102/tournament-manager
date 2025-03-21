@@ -5,60 +5,6 @@ import { Match } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 import { addConnection, removeConnection, getConnections } from "@/app/lib/connectionsStore";
 
-// Send update to all connections when a match is deleted
-export async function sendMatchDeleteUpdate(matchId: string) {
-	// Get the new current match (if any)
-	const nextCurrentMatch = await getCurrentLiveMatch();
-	const encoder = new TextEncoder();
-	const connections = getConnections();
-
-	for (const [key, controller] of connections.entries()) {
-		if (key.endsWith(`#${matchId}`)) {
-			// For connections listening to the specific deleted match
-			// Send a deletion event
-			controller.enqueue(encoder.encode(`event: matchDeleted\ndata: ${matchId}\n\n`));
-		} else if (key.endsWith("#current")) {
-			if (nextCurrentMatch) {
-				controller.enqueue(encoder.encode(`data: ${JSON.stringify(nextCurrentMatch)}\n\n`));
-			} else {
-				const placeholder = {
-					id: "placeholder",
-					team1: "",
-					team2: "",
-					score1: 0,
-					score2: 0,
-					mode: "1x15",
-					rank: "1/?",
-					status: "scheduled",
-					currentTime: "0",
-					addedTime: 0
-				};
-				controller.enqueue(encoder.encode(`data: ${JSON.stringify(placeholder)}\n\n`));
-			}
-		}
-	}
-}
-
-// Function to check if a match is the current (most recent live) match
-async function isCurrentMatch(match: Match): Promise<boolean> {
-	const matches = await getMatches();
-	const liveMatches = matches.filter(
-		m => m.status === "live" || match.status === "half-time" || match.status === "penalties"
-	);
-
-	if (liveMatches.length === 0) return false;
-
-	// Sort by startedAt (most recent first)
-	const sortedMatches = liveMatches.sort((a, b) => {
-		const timeA = a.startedAt || 0;
-		const timeB = b.startedAt || 0;
-		return timeB - timeA;
-	});
-
-	// Check if this match is the most recent live match
-	return sortedMatches[0].id === match.id;
-}
-
 // Get current live match
 async function getCurrentLiveMatch(): Promise<Match | undefined> {
 	const matches = await getMatches();
@@ -140,6 +86,3 @@ export async function GET(request: NextRequest) {
 		}
 	});
 }
-
-// Export the isCurrentMatch function for use in the match actions
-export { isCurrentMatch };

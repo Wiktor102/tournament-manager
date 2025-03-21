@@ -5,8 +5,7 @@ import fs from "fs/promises";
 import path from "path";
 import { v4 as uuid } from "uuid";
 import { Match, InitialMatchData } from "../../types/types";
-import { isCurrentMatch, sendMatchDeleteUpdate } from "../api/events/route";
-import { sendMatchUpdate } from "@/app/lib/connectionsStore";
+import { sendMatchDeleteUpdate, sendMatchUpdate } from "@/app/lib/connectionsStore";
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
 
@@ -230,6 +229,26 @@ export async function startPenalties(matchId: string) {
 	}
 }
 
+/** Function to check if a match is the current (most recent live) match*/
+async function isCurrentMatch(match: Match): Promise<boolean> {
+	const matches = await readMatchesFromFile();
+	const liveMatches = matches.filter(
+		m => m.status === "live" || match.status === "half-time" || match.status === "penalties"
+	);
+
+	if (liveMatches.length === 0) return false;
+
+	// Sort by startedAt (most recent first)
+	const sortedMatches = liveMatches.sort((a, b) => {
+		const timeA = a.startedAt || 0;
+		const timeB = b.startedAt || 0;
+		return timeB - timeA;
+	});
+
+	// Check if this match is the most recent live match
+	return sortedMatches[0].id === match.id;
+}
+
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch, getCurrentLiveMatch };
 export { startMatch, updateMatchScore, updateMatchAdditionalTime, updateMatchTeams, endMatch, startBreak, resumeFromBreak };
-export { createMatch, deleteMatch };
+export { createMatch, deleteMatch, isCurrentMatch };
