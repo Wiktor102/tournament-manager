@@ -1,0 +1,26 @@
+.slip-counter {
+	display: inline-flex;
+	position: relative;
+	font-size: 1.5rem;
+	border-radius: 10rem;
+	background-color: #2e72b9;
+	align-items: center;
+
+	.slip-counter-label {
+		font-weight: 500;
+		padding-block: 0.5rem;
+	}
+
+	& > * {
+		padding: 0.5rem 1rem;
+	}
+
+	.slip-counter-value {
+		font-weight: 700;
+		background-color: #4a9ffa;
+		border-radius: 10rem;
+		min-width: 30px;
+		text-align: center;
+		margin-left: 1rem;
+	}
+}

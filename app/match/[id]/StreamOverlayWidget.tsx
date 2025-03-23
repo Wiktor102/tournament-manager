@@ -75,7 +75,7 @@ function StreamOverlayWidget({
 	}
 
 	return (
-		<>
+		<div>
 			<h3>Liga elektronika: {match.rank ?? "1/?"}</h3>
 			<div className="counter-widget widget">
 				<span className="team-name">{match.team1}</span>
@@ -87,7 +87,7 @@ function StreamOverlayWidget({
 			<div className="timer-widget widget" suppressHydrationWarning>
 				{isFinished ? <span className="finished-timer">zakończony</span> : <MatchTimer match={match} />}
 			</div>
-		</>
+		</div>
 	);
 }
 

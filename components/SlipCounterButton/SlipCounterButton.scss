@@ -1,0 +1,23 @@
+.slip-counter-button {
+	background-color: #2196f3;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	padding: 10px 16px;
+	font-size: 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		background-color: #1976d2;
+	}
+
+	&:disabled {
+		background-color: #bbdefb;
+		cursor: not-allowed;
+	}
+}

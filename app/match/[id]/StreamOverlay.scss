@@ -4,7 +4,14 @@ body {
 }
 
 .stream-overlay {
+	display: flex;
+	justify-content: space-between;
+	align-items: end;
 	margin: 1rem 2rem;
+
+	& > * > *:not(h3) {
+		color: #fff;
+	}
 }
 
 .return-home {

@@ -2,6 +2,7 @@ import { getMatch, getCurrentLiveMatch } from "@/app/actions/matchActions";
 import { notFound } from "next/navigation";
 import StreamOverlayWidget from "./StreamOverlayWidget";
 import Link from "next/link";
+import SlipCounter from "@/components/SlipCounter/SlipCounter";
 
 // styles
 import "./StreamOverlay.scss";
@@ -17,6 +18,7 @@ export default async function StreamOverlay({ params }: { params: Promise<{ id: 
 		return (
 			<div className="stream-overlay">
 				<StreamOverlayWidget initialMatch={initialMatch} isCurrent={true} noMatchAvailable={!initialMatch} />
+				<SlipCounter />
 			</div>
 		);
 	}
@@ -30,6 +32,7 @@ export default async function StreamOverlay({ params }: { params: Promise<{ id: 
 	return (
 		<div className="stream-overlay">
 			<StreamOverlayWidget initialMatch={initialMatch} />
+			<SlipCounter />
 			<Link href="/" className="return-home">
 				Powrót do strony głównej
 			</Link>

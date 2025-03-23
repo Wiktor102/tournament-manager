@@ -73,4 +73,18 @@
 			cursor: pointer;
 		}
 	}
+
+	.slip-tracker-section {
+		margin: 20px 0;
+		padding: 15px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 8px;
+		background-color: rgba(0, 0, 0, 0.2);
+
+		.slip-counter-info {
+			margin-bottom: 10px;
+			font-size: 0.9rem;
+			color: #e0e0e0;
+		}
+	}
 }

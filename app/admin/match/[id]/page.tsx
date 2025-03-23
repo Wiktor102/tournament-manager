@@ -9,6 +9,8 @@ import EndMatchButton from "@/components/EndMatchButton/EndMatchButton";
 import BreakButton from "@/components/BreakButton/BreakButton";
 import PenaltyButton from "@/components/PenaltyButton/PenaltyButton";
 import StartMatchButton from "@/components/StartMatchButton/StartMatchButton";
+import SlipCounterButton from "@/components/SlipCounterButton/SlipCounterButton";
+import { getSlipCount } from "@/app/actions/slipCounterActions";
 
 async function MatchManagerPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = await params;
@@ -16,6 +18,7 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 	if (!match) notFound();
 
 	const [matchStatus, statusColor] = getMatchStatus(match);
+	const slipCount = await getSlipCount();
 
 	return (
 		<div className="match-manager-page">
@@ -45,6 +48,13 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 
 				<ExtraTimeUpdater match={match} />
 				<LiveScoreUpdater match={match} />
+
+				<div className="slip-tracker-section">
+					<div className="slip-counter-info">
+						Obecna liczba poślizgnięć: <strong>{slipCount}</strong>
+					</div>
+					<SlipCounterButton />
+				</div>
 
 				<div className="buttons">
 					{match.status === "scheduled" && <StartMatchButton match={match} />}
