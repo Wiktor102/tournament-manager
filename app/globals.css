@@ -41,6 +41,16 @@
     --shadow: rgba(0, 0, 0, 0.1);
     --header-background: var(--color-gray-200);
 
+    /* Semantic variables - dark theme overrides */
+    --background: var(--color-gray-950);
+    --foreground: var(--color-gray-100);
+    --surface: var(--color-gray-800);
+    --section-border: var(--color-gray-700);
+    --empty-state: var(--color-gray-400);
+    --text-secondary: var(--color-gray-400);
+    --shadow: rgba(0, 0, 0, 0.5);
+    --header-background: var(--color-gray-900);
+
     /* Button colors */
     --button-live-score: var(--color-green-500);
     --button-live-score-hover: var(--color-green-600);
