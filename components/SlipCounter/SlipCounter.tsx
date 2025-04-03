@@ -35,7 +35,7 @@ export default function SlipCounter() {
 
 	return (
 		<div className="slip-counter">
-			<div className="slip-counter-label">Poślizgnięcia:</div>
+			<div className="slip-counter-label">Wywrotki 😉:</div>
 			<div className="slip-counter-value">{slipCount}</div>
 		</div>
 	);

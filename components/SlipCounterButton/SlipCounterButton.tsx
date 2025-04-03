@@ -20,7 +20,7 @@ export default function SlipCounterButton() {
 
 	return (
 		<button className="slip-counter-button" onClick={handleIncrementSlipCount} disabled={isUpdating}>
-			{isUpdating ? "Aktualizowanie..." : "Dodaj poślizgnięcie 🧊"}
+			{isUpdating ? "Aktualizowanie..." : "Dodaj wywrotkę"}
 		</button>
 	);
 }

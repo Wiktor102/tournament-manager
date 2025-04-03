@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "9fc7c991-1b8c-4576-af08-798f9d7d0a40",
+    "team1": "T",
+    "team2": "T2",
+    "mode": "1x15",
+    "rank": "",
+    "startedAt": 1742727782496,
+    "score1": 2,
+    "score2": 2,
+    "status": "live",
+    "currentTime": "0",
+    "addedTime": 0
+  }
+]
