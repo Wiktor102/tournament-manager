@@ -59,10 +59,10 @@ async function MatchManagerPage({ params }: { params: Promise<{ id: string }> })
 				<div className="buttons">
 					{match.status === "scheduled" && <StartMatchButton match={match} />}
 					{!match.resumedAt && match.mode === "2x10" && <BreakButton match={match} />}
-					{match.status === "live" && (match.resumedAt || match.mode === "1x15") && (
+					{match.status === "live" && (match.resumedAt || match.mode === "1x12") && (
 						<PenaltyButton match={match} />
 					)}
-					{["live", "penalties"].includes(match.status) && (match.resumedAt || match.mode === "1x15") && (
+					{["live", "penalties"].includes(match.status) && (match.resumedAt || match.mode === "1x12") && (
 						<EndMatchButton match={match} />
 					)}
 				</div>

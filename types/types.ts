@@ -3,7 +3,7 @@ export interface Match {
 	team1: string;
 	team2: string;
 	status: "scheduled" | "live" | "half-time" | "finished" | "penalties";
-	mode: "1x15" | "2x10";
+	mode: "1x12" | "2x10";
 	rank: string;
 
 	score1: number;
@@ -20,7 +20,7 @@ export interface InitialMatchData {
 	homeTeam: string;
 	awayTeam: string;
 	rank: string;
-	mode: "1x15" | "2x10";
+	mode: "1x12" | "2x10";
 }
 
 export interface MatchUpdate {

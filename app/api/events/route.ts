@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 				team2: "",
 				score1: 0,
 				score2: 0,
-				mode: "1x15",
+				mode: "1x12",
 				rank: "1/?",
 				status: "scheduled",
 				currentTime: "0",

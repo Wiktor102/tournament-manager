@@ -13,7 +13,7 @@ export default function MatchForm() {
 		homeTeam: "",
 		awayTeam: "",
 		rank: "",
-		mode: "1x15"
+		mode: "1x12"
 	};
 	const [formData, setFormData] = useState<InitialMatchData>(initialData);
 
@@ -81,10 +81,10 @@ export default function MatchForm() {
 					id="mode"
 					name="mode"
 					value={formData.mode}
-					onChange={e => setFormData(prev => ({ ...prev, mode: e.target.value as "1x15" | "2x10" }))}
+					onChange={e => setFormData(prev => ({ ...prev, mode: e.target.value as "1x12" | "2x10" }))}
 					required
 				>
-					<option value="1x15">1x 15 min</option>
+					<option value="1x12">1x 15 min</option>
 					<option value="2x10">2x 10 min</option>
 				</select>
 			</div>
