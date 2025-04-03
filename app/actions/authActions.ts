@@ -20,7 +20,7 @@ const login = async (password: string): Promise<{ success: boolean; error?: stri
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "strict",
-			maxAge: 3600, // 1 hour
+			maxAge: 60 * 60 * 48, // 48 hours
 			path: "/"
 		});
 
