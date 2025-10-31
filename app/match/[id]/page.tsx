@@ -18,7 +18,6 @@ export default async function StreamOverlay({ params }: { params: Promise<{ id: 
 		return (
 			<div className="stream-overlay">
 				<StreamOverlayWidget initialMatch={initialMatch} isCurrent={true} noMatchAvailable={!initialMatch} />
-				<SlipCounter />
 			</div>
 		);
 	}

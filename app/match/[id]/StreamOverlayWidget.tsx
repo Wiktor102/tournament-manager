@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import useLiveMatch from "@/lib/hooks/useLiveMatch";
 import { Match } from "@/types/types";
-import MatchTimer from "@/components/MatchTimer";
+import Image from "next/image";
 
 // styles
 import "./StreamOverlayWidget.scss";
@@ -76,16 +76,22 @@ function StreamOverlayWidget({
 
 	return (
 		<div>
-			<h3>Liga elektronika: {match.rank ?? "1/?"}</h3>
 			<div className="counter-widget widget">
-				<span className="team-name">{match.team1}</span>
-				<span className={`score ${winnerClass}`}>
-					{match.score1} : {match.score2}
-				</span>
-				<span className="team-name">{match.team2}</span>
-			</div>
-			<div className="timer-widget widget" suppressHydrationWarning>
-				{isFinished ? <span className="finished-timer">zakończony</span> : <MatchTimer match={match} />}
+				<span className="serve-indicator serve-indicator--active"></span>
+				<div className="team-name-container">
+					<span className="team-name">4J</span>
+					<div className="score-sets-container">
+						<div className="score-sets">XX</div>
+						<div className="score-points-container">
+							<div className="score-points">XX</div>
+							<Image src="/elektronik-logo2.png" alt="Liga elektronika" width={64} height={64} />
+							<div className="score-points">XX</div>
+						</div>
+						<div className="score-sets">XX</div>
+					</div>
+					<span className="team-name">3E</span>
+				</div>
+				<span className="serve-indicator"></span>
 			</div>
 		</div>
 	);

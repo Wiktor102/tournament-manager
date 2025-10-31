@@ -4,10 +4,13 @@ body {
 }
 
 .stream-overlay {
+	position: absolute;
+	inset: 0;
+
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
 	align-items: end;
-	margin: 1rem 2rem;
+	margin: 2.5%;
 
 	& > * > *:not(h3) {
 		color: #fff;

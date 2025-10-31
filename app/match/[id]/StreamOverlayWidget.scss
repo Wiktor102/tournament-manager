@@ -1,35 +1,104 @@
-h3 {
-	margin-block: 1rem 0.5rem;
-	font-style: italic;
-}
-
 .widget {
-	display: inline-flex;
+	display: flex;
 	position: relative;
 	padding: 0 1rem;
-	font-size: 1.5rem;
-	border-radius: 10rem;
 }
 
 .counter-widget {
-	background-color: #2e72b9;
+	background-color: #005bb5;
+	border-radius: 0.3rem;
 
-	& > span {
-		padding-block: 0.5rem;
-	}
-
-	.score {
-		margin-inline: 1rem;
-		padding-inline: 1rem;
-		background-color: #4a9ffa;
-		border-radius: 10rem;
+	& > * {
+		display: grid;
+		place-content: center;
 	}
 }
 
-.timer-widget {
-	padding: 0.5rem 1rem;
-	background-color: #4a9ffa;
-	margin-left: 1rem;
+.team-name-container {
+	display: flex;
+	align-items: center;
+	margin-inline: 0.5rem;
+}
+
+.team-name {
+	font-weight: bold;
+	font-size: 1.5rem;
+}
+
+.score-sets-container {
+	display: flex;
+	align-items: center;
+	margin-inline: 1rem;
+}
+
+.score-sets {
+	text-align: center;
+	font-size: 1.25rem;
+	background-color: #005bb5;
+
+	&::before {
+		display: block;
+		width: 100%;
+
+		content: "Sety";
+		font-size: 0.8rem;
+
+		color: #ffd700; // gold color
+		margin-right: 0.5rem;
+	}
+}
+
+.score-points-container {
+	display: flex;
+	position: relative;
+	align-items: center;
+	margin-inline: 1rem;
+	padding: 0.25rem 1rem;
+
+	font-size: 1.5rem;
+	background-color: #00376f;
+
+	img {
+		height: 3rem;
+		width: 3rem;
+		margin-inline: 0.5rem;
+	}
+
+	&::before {
+		content: "Mecz nr 1";
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		text-align: center;
+		translate: 0 -100%;
+
+		padding: 0.25rem 0.5rem;
+		clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+		border-top-left-radius: 5rem;
+		border-top-right-radius: 5rem;
+
+		font-size: 1rem;
+		background-color: #005bb5;
+	}
+}
+
+.serve-indicator {
+	&::after {
+		content: "";
+		display: inline-block;
+		width: 0.75rem;
+		height: 0.75rem;
+		border-radius: 50%;
+		background-color: #ffd700;
+		font-size: 4rem;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+
+	&--active::after {
+		opacity: 1;
+	}
 }
 
 .no-match-widget {
