@@ -20,8 +20,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.match-status,
-	.match-time {
+	.match-status {
 		font-size: 1.125rem;
 		margin-bottom: 1rem;
 		color: var(--foreground);
@@ -34,29 +33,29 @@
 		}
 	}
 
-	.time-value {
-		background-color: var(--background);
+	.match-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 0.95rem;
+
+		span {
+			display: inline-flex;
+			gap: 0.35rem;
+			align-items: baseline;
+		}
 	}
 
-	.set-additional-time {
-		font-size: 1.125rem;
-		margin-bottom: 1rem;
-		color: var(--foreground);
-
-		input,
-		button {
-			padding: 0.25em 0.5em;
-			border-radius: 5px;
-			font-weight: 600;
-			border: 0;
-			text-transform: capitalize;
-			font-size: inherit;
-		}
-
-		button {
-			margin-left: 0.5rem;
-			font-weight: normal;
-		}
+	.winner-banner {
+		margin-bottom: 1.5rem;
+		padding: 0.75rem 1rem;
+		background: rgba(255, 215, 0, 0.15);
+		border: 1px solid rgba(255, 215, 0, 0.4);
+		border-radius: 0.5rem;
+		font-weight: 600;
+		color: #ffe28a;
 	}
 
 	.live-score {
@@ -71,20 +70,6 @@
 		button {
 			padding: 0.5rem;
 			cursor: pointer;
-		}
-	}
-
-	.slip-tracker-section {
-		margin: 20px 0;
-		padding: 15px;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 8px;
-		background-color: rgba(0, 0, 0, 0.2);
-
-		.slip-counter-info {
-			margin-bottom: 10px;
-			font-size: 0.9rem;
-			color: #e0e0e0;
 		}
 	}
 }

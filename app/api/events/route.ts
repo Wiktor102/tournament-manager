@@ -5,12 +5,26 @@ import { Match } from "@/types/types";
 import { NextRequest, NextResponse } from "next/server";
 import { addConnection, removeConnection, getConnections } from "@/app/lib/connectionsStore";
 
+const PLACEHOLDER_MATCH: Match = {
+	id: "placeholder",
+	team1: "",
+	team2: "",
+	status: "scheduled",
+	rank: "1/16",
+	format: "twoSetsTo11",
+	sets: [
+		{ setNumber: 1, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false },
+		{ setNumber: 2, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false }
+	],
+	currentSet: 0,
+	servingTeam: "team1",
+	decidedByTotalPoints: false
+};
+
 // Get current live match
 async function getCurrentLiveMatch(): Promise<Match | undefined> {
 	const matches = await getMatches();
-	const liveMatches = matches.filter(
-		match => match.status === "live" || match.status === "half-time" || match.status === "penalties"
-	);
+	const liveMatches = matches.filter(match => match.status === "live");
 
 	if (liveMatches.length === 0) {
 		return undefined;
@@ -41,19 +55,7 @@ export async function GET(request: NextRequest) {
 		// If no live match found, instead of returning an error,
 		// we'll set up an SSE connection that will be updated when a match is created
 		if (!match) {
-			// Create a placeholder response
-			match = {
-				id: "placeholder",
-				team1: "",
-				team2: "",
-				score1: 0,
-				score2: 0,
-				mode: "1x12",
-				rank: "1/?",
-				status: "scheduled",
-				currentTime: "0",
-				addedTime: 0
-			};
+			match = PLACEHOLDER_MATCH;
 		}
 	} else {
 		// Normal match lookup
