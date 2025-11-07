@@ -38,6 +38,35 @@
 		font-size: 1rem;
 	}
 
+	.serving-team-picker {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		font-size: 0.95rem;
+
+		.serving-team-options {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+
+			label {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				cursor: pointer;
+				text-transform: uppercase;
+
+				span {
+					font-weight: 600;
+				}
+			}
+
+			input[type="radio"] {
+				accent-color: var(--button-live-score);
+			}
+		}
+	}
+
 	& > div + div {
 		margin-block-start: 1rem;
 	}

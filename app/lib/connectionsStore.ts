@@ -46,8 +46,7 @@ export async function sendMatchUpdate(matchId: string, data: Match, isCurrentMat
 			// Send to both specific match listeners and "current" listeners.
 			if (
 				key.endsWith(`#${matchId}`) ||
-				(key.endsWith("#current") &&
-					((await isCurrentMatchFn(data)) || data.status === "finished" || data.status === "penalties"))
+				(key.endsWith("#current") && ((await isCurrentMatchFn(data)) || data.status === "finished"))
 			) {
 				const encoder = new TextEncoder();
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
@@ -76,17 +75,20 @@ export async function sendMatchDeleteUpdate(matchId: string) {
 			if (nextCurrentMatch) {
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(nextCurrentMatch)}\n\n`));
 			} else {
-				const placeholder = {
+				const placeholder: Match = {
 					id: "placeholder",
 					team1: "",
 					team2: "",
-					score1: 0,
-					score2: 0,
-					mode: "1x12",
-					rank: "1/?",
 					status: "scheduled",
-					currentTime: "0",
-					addedTime: 0
+					rank: "1/16",
+					format: "twoSetsTo11",
+					sets: [
+						{ setNumber: 1, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false },
+						{ setNumber: 2, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false }
+					],
+					currentSet: 0,
+					servingTeam: "team1",
+					decidedByTotalPoints: false
 				};
 				controller.enqueue(encoder.encode(`data: ${JSON.stringify(placeholder)}\n\n`));
 			}

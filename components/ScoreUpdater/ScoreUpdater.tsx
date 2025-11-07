@@ -1,59 +1,165 @@
 "use client";
 
-import { useState, useOptimistic, useTransition, MouseEvent } from "react";
-import { updateMatchScore } from "@/app/actions/matchActions";
-import { Match } from "@/types/types";
+import { useEffect, useState, useTransition } from "react";
+import { setServingTeam, updateSetScore } from "@/app/actions/matchActions";
+import { Match, TeamSide } from "@/types/types";
 
 // styles
 import "./ScoreUpdater.scss";
 
-export default function ScoreUpdater({ match }: { match: Match }) {
-	const [realScore, setRealScore] = useState({ team1: match.score1, team2: match.score2 });
-	const [, startTransition] = useTransition();
-	const [optimisticScore, changeOptimisticScore] = useOptimistic(
-		realScore,
-		(state, { team, change }: { team: "team1" | "team2"; change: number }) => ({
-			...state,
-			[team]: state[team] + change
-		})
-	);
+interface ScoreUpdaterProps {
+	match: Match;
+}
 
-	function handleScoreUpdateClick(e: MouseEvent, team: "team1" | "team2", change: 1 | -1) {
-		e.preventDefault();
-		if (change === -1) {
-			if (!confirm("Czy na pewno chcesz zmniejszyć wynik?")) return;
+export default function ScoreUpdater({ match }: ScoreUpdaterProps) {
+	const [viewMatch, setViewMatch] = useState(match);
+	const [isPending, startTransition] = useTransition();
+
+	useEffect(() => {
+		setViewMatch(match);
+	}, [match]);
+
+	const applyLocalSetUpdate = (setIndex: number, team: TeamSide, change: 1 | -1) => {
+		setViewMatch(prev => {
+			const sets = prev.sets.map(set => ({ ...set }));
+			const target = sets[setIndex];
+			if (!target) {
+				return prev;
+			}
+			const key = team === "team1" ? "team1Points" : "team2Points";
+			target[key] = Math.max(0, target[key] + change);
+			return { ...prev, sets };
+		});
+	};
+
+	const handlePointChange = (setIndex: number, team: TeamSide, change: 1 | -1) => {
+		const previousState = viewMatch;
+		if (change === -1 && !window.confirm("Czy na pewno chcesz zmniejszyć wynik?")) {
+			return;
 		}
 
 		startTransition(async () => {
+			applyLocalSetUpdate(setIndex, team, change);
 			try {
-				const updatedMatch = await updateMatchScore(match.id, { team, change });
-				setRealScore({ team1: updatedMatch.score1, team2: updatedMatch.score2 });
-				changeOptimisticScore({ team, change });
+				const updated = await updateSetScore(match.id, { setIndex, team, change });
+				setViewMatch(updated);
 			} catch (error) {
-				console.error("Error updating score:", error);
-				setRealScore(realScore);
+				console.error("Error updating set score:", error);
+				setViewMatch(previousState);
 			}
 		});
-	}
+	};
+
+	const handleServingTeamChange = (team: TeamSide) => {
+		if (viewMatch.servingTeam === team) return;
+		const previous = viewMatch.servingTeam;
+		startTransition(async () => {
+			setViewMatch(prev => ({ ...prev, servingTeam: team }));
+			try {
+				const updated = await setServingTeam(match.id, team);
+				setViewMatch(updated);
+			} catch (error) {
+				console.error("Error updating serving team:", error);
+				setViewMatch(prev => ({ ...prev, servingTeam: previous }));
+			}
+		});
+	};
 
 	return (
-		<>
-			<form className="score-updater" action="" inert={!["live", "penalties"].includes(match.status)}>
-				<div className="manipulate-score">
-					<button onClick={e => handleScoreUpdateClick(e, "team1", 1)}>+</button>
-					<button onClick={e => handleScoreUpdateClick(e, "team1", -1)}>-</button>
+		<section className="score-updater" aria-live="polite">
+			<div className="score-updater__header">
+				<h2>Kontrola punktów</h2>
+				<div className="serve-toggle" role="group" aria-label="Zmiana serwującej drużyny">
+					<span>Serwuje:</span>
+					<div className="serve-toggle__buttons">
+						<button
+							type="button"
+							className={viewMatch.servingTeam === "team1" ? "active" : ""}
+							onClick={() => handleServingTeamChange("team1")}
+							disabled={isPending}
+						>
+							{match.team1}
+						</button>
+						<button
+							type="button"
+							className={viewMatch.servingTeam === "team2" ? "active" : ""}
+							onClick={() => handleServingTeamChange("team2")}
+							disabled={isPending}
+						>
+							{match.team2}
+						</button>
+					</div>
 				</div>
-				<div className="score">
-					<span data-team-name={match.team1}>{optimisticScore.team1}</span>
-					<span>:</span>
-					<span data-team-name={match.team2}>{optimisticScore.team2}</span>
-					{/* {isPending && <span className="loading-indicator">Odświeżanie...</span>} */}
-				</div>
-				<div className="manipulate-score">
-					<button onClick={e => handleScoreUpdateClick(e, "team2", 1)}>+</button>
-					<button onClick={e => handleScoreUpdateClick(e, "team2", -1)}>-</button>
-				</div>
-			</form>
-		</>
+			</div>
+
+			<table className="set-score-table">
+				<thead>
+					<tr>
+						<th>Set</th>
+						<th>{match.team1}</th>
+						<th>{match.team2}</th>
+						<th>Zwycięzca</th>
+					</tr>
+				</thead>
+				<tbody>
+					{viewMatch.sets.map((set, index) => {
+						const isActive = index === viewMatch.currentSet && viewMatch.status !== "finished";
+						const winnerName = set.winner === "team1" ? match.team1 : set.winner === "team2" ? match.team2 : "-";
+
+						return (
+							<tr
+								key={`${set.setNumber}-${index}`}
+								className={`${isActive ? "active" : ""} ${set.isTieBreak ? "tie-break" : ""}`}
+							>
+								<td>
+									Set {set.setNumber}
+									{set.isTieBreak ? " (dogrywka)" : ""}
+								</td>
+								<td>
+									<div className="score-controls">
+										<button
+											type="button"
+											onClick={() => handlePointChange(index, "team1", 1)}
+											disabled={isPending}
+										>
+											+
+										</button>
+										<span>{set.team1Points}</span>
+										<button
+											type="button"
+											onClick={() => handlePointChange(index, "team1", -1)}
+											disabled={isPending || set.team1Points === 0}
+										>
+											-
+										</button>
+									</div>
+								</td>
+								<td>
+									<div className="score-controls">
+										<button
+											type="button"
+											onClick={() => handlePointChange(index, "team2", 1)}
+											disabled={isPending}
+										>
+											+
+										</button>
+										<span>{set.team2Points}</span>
+										<button
+											type="button"
+											onClick={() => handlePointChange(index, "team2", -1)}
+											disabled={isPending || set.team2Points === 0}
+										>
+											-
+										</button>
+									</div>
+								</td>
+								<td className="set-winner">{winnerName}</td>
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
+			{isPending && <p className="update-indicator">Zapisywanie zmian...</p>}
+		</section>
 	);
 }

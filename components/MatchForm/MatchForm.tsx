@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createMatch } from "@/app/actions/matchActions";
 import "./MatchForm.scss";
-import { InitialMatchData } from "@/types/types";
+import { InitialMatchData, TeamSide, TournamentRank } from "@/types/types";
 
 export default function MatchForm() {
 	const router = useRouter();
@@ -12,14 +12,22 @@ export default function MatchForm() {
 	const initialData: InitialMatchData = {
 		homeTeam: "",
 		awayTeam: "",
-		rank: "",
-		mode: "1x12"
+		rank: "1/16",
+		servingTeam: "team1"
 	};
 	const [formData, setFormData] = useState<InitialMatchData>(initialData);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setFormData(prev => ({ ...prev, [name]: value }));
+	};
+
+	const handleRankChange = (value: string) => {
+		setFormData(prev => ({ ...prev, rank: value as TournamentRank }));
+	};
+
+	const handleServingTeamChange = (value: TeamSide) => {
+		setFormData(prev => ({ ...prev, servingTeam: value }));
 	};
 
 	const handleSubmit = async () => {
@@ -64,7 +72,7 @@ export default function MatchForm() {
 					id="rank"
 					name="rank"
 					value={formData.rank}
-					onChange={e => setFormData(prev => ({ ...prev, rank: e.target.value }))}
+					onChange={e => handleRankChange(e.target.value)}
 					required
 				>
 					<option value="1/16">1/16</option>
@@ -75,18 +83,30 @@ export default function MatchForm() {
 					<option value="O 3 miejsce">O 3 miejsce</option>
 				</select>
 			</div>
-			<div>
-				<label htmlFor="mode">Tryb rozgrywki: </label>
-				<select
-					id="mode"
-					name="mode"
-					value={formData.mode}
-					onChange={e => setFormData(prev => ({ ...prev, mode: e.target.value as "1x12" | "2x10" }))}
-					required
-				>
-					<option value="1x12">1x 15 min</option>
-					<option value="2x10">2x 10 min</option>
-				</select>
+			<div className="serving-team-picker">
+				<span>Kto rozpoczyna serwis?</span>
+				<div className="serving-team-options">
+					<label>
+						<input
+							type="radio"
+							name="servingTeam"
+							value="team1"
+							checked={formData.servingTeam === "team1"}
+							onChange={() => handleServingTeamChange("team1")}
+						/>
+						<span>{formData.homeTeam || "Gospodarz"}</span>
+					</label>
+					<label>
+						<input
+							type="radio"
+							name="servingTeam"
+							value="team2"
+							checked={formData.servingTeam === "team2"}
+							onChange={() => handleServingTeamChange("team2")}
+						/>
+						<span>{formData.awayTeam || "Gość"}</span>
+					</label>
+				</div>
 			</div>
 
 			<div>

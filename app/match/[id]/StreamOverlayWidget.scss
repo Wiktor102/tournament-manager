@@ -35,16 +35,24 @@
 	text-align: center;
 	font-size: 1.25rem;
 	background-color: #005bb5;
+	padding: 0.35rem 0.75rem;
+	border-radius: 0.75rem;
+	min-width: 3.5rem;
+
+	span {
+		display: block;
+		font-weight: 700;
+	}
 
 	&::before {
 		display: block;
 		width: 100%;
-
-		content: "Sety";
-		font-size: 0.8rem;
-
-		color: #ffd700; // gold color
-		margin-right: 0.5rem;
+		content: attr(data-label);
+		font-size: 0.75rem;
+		color: #ffd700;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: 0.25rem;
 	}
 }
 
@@ -66,7 +74,7 @@
 	}
 
 	&::before {
-		content: "Mecz nr 1";
+		content: attr(data-rank) ": " attr(data-label);
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -81,6 +89,9 @@
 
 		font-size: 1rem;
 		background-color: #005bb5;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
 	}
 }
 
@@ -103,11 +114,12 @@
 }
 
 .no-match-widget {
-	justify-content: center;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding-block: 0.75rem;
 }
 
 .no-match-text {
-	padding-block: 0.5rem;
 	color: white;
 	font-style: italic;
 }

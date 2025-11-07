@@ -20,11 +20,7 @@ function EndMatchButton({ match }: { match: Match }) {
 	};
 
 	return (
-		<Button
-			variant="destructive"
-			onClick={handleEndMatch}
-			disabled={(!match.resumedAt && match.mode === "2x10") || isPending}
-		>
+		<Button variant="destructive" onClick={handleEndMatch} disabled={match.status !== "live" || isPending}>
 			{isPending ? "Kończenie..." : "Zakończ"}
 		</Button>
 	);

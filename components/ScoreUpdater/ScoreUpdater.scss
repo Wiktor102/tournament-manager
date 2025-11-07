@@ -1,101 +1,136 @@
-form.score-updater {
-	display: inline-flex;
-	gap: 1.75rem;
-	align-items: center;
-	margin-top: 1rem;
-
-	.manipulate-score {
-		display: flex;
-		gap: 0.875rem;
-	}
-
-	button {
-		width: 2.5rem;
-		height: 2.5rem;
-		font-size: 1.7rem;
-		text-align: center;
-		border: 1px solid var(--border);
-		border-radius: 0.25rem;
-		cursor: pointer;
-		transition: background-color 200ms;
-
-		&:hover,
-		&:focus {
-			background-color: var(--background);
-		}
-	}
-
-	.score {
-		position: relative;
-		font-size: 2rem;
-		font-weight: bold;
-		color: var(--foreground);
-	}
-
-	.score > span {
-		position: relative;
-	}
-
-	.score > span::before {
-		content: attr(data-team-name);
-		position: absolute;
-		top: -1rem;
-		left: 50%;
-		transform: translateX(-50%);
-		font-size: 0.75rem;
-		font-weight: 400;
-		opacity: 0.8;
-	}
-
-	.score .loading-indicator {
-		position: absolute;
-		bottom: -1rem;
-		left: 50%;
-		transform: translateX(-50%);
-		font-size: 0.7rem;
-		font-weight: normal;
-		opacity: 0.65;
-	}
-
-	&[inert] > *:not(.score) {
-		opacity: 0.5;
-	}
-}
-
-.match-status-actions {
+.score-updater {
+	margin-top: 1.5rem;
+	padding: 1.5rem;
+	border: 1px solid var(--border);
+	border-radius: 0.75rem;
+	background: rgba(16, 16, 16, 0.35);
+	backdrop-filter: blur(6px);
 	display: flex;
+	flex-direction: column;
 	gap: 1.5rem;
-	align-items: center;
-	margin-top: 1rem;
 
-	button {
-		padding: 0.5rem 1rem;
-		font-size: 1rem;
-		font-weight: bold;
-		border: 1px solid var(--border);
-		border-radius: 0.25rem;
-		cursor: pointer;
-		transition: background-color 200ms;
+	&__header {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
 
-		&.green {
-			background-color: var(--button-live-score);
+		h2 {
+			margin: 0;
+			font-size: 1.4rem;
+		}
+	}
 
-			&:hover {
-				background-color: var(--button-live-score-hover);
+	.serve-toggle {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		font-size: 0.95rem;
+
+		&__buttons {
+			display: inline-flex;
+			gap: 0.5rem;
+
+			button {
+				padding: 0.45rem 0.9rem;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: transparent;
+				color: inherit;
+				cursor: pointer;
+				transition: background-color 180ms ease, border-color 180ms ease;
+
+				&.active {
+					background: var(--button-live-score);
+					border-color: var(--button-live-score);
+				}
+
+				&:disabled {
+					opacity: 0.6;
+					cursor: progress;
+				}
+
+				&:not(:disabled):hover,
+				&:not(:disabled):focus-visible {
+					background: var(--button-live-score-hover);
+					border-color: var(--button-live-score-hover);
+				}
+			}
+		}
+	}
+
+	.set-score-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.95rem;
+
+		thead th {
+			text-align: left;
+			padding: 0.75rem;
+			border-bottom: 1px solid var(--border);
+		}
+
+		tbody td {
+			padding: 0.75rem;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		tbody tr.active {
+			background: rgba(96, 165, 250, 0.08);
+		}
+
+		tbody tr.tie-break {
+			d td:first-child {
+				font-style: italic;
+			}
+		}
+	}
+
+	.score-controls {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+
+		button {
+			width: 2rem;
+			height: 2rem;
+			border-radius: 0.4rem;
+			border: 1px solid var(--border);
+			font-size: 1.2rem;
+			line-height: 1;
+			background: rgba(0, 0, 0, 0.35);
+			color: inherit;
+			cursor: pointer;
+			transition: background-color 180ms ease, border-color 180ms ease;
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+
+			&:not(:disabled):hover,
+			&:not(:disabled):focus-visible {
+				background: var(--button-live-score);
+				border-color: var(--button-live-score);
 			}
 		}
 
-		&.orange {
-			background-color: var(--button-live-score);
-
-			&:hover {
-				background-color: var(--button-live-score-hover);
-			}
+		span {
+			min-width: 2rem;
+			text-align: center;
+			font-weight: 600;
 		}
+	}
 
-		&:hover,
-		&:focus {
-			background-color: var(--background);
-		}
+	.set-winner {
+		font-weight: 600;
+	}
+
+	.update-indicator {
+		margin: 0;
+		font-size: 0.85rem;
+		opacity: 0.75;
+		align-self: flex-end;
 	}
 }
