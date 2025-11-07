@@ -1,91 +1,113 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Match } from "@/types/types";
 import { getMatch, getCurrentLiveMatch } from "@/app/actions/matchActions";
 
 type LiveMatch = Match & { _deleted?: boolean };
+
+type RealtimeMessage = { type: "match:update"; payload: Match } | { type: "match:deleted"; payload: { matchId: string } };
+
 function useLiveMatch(initialMatch: Match, isCurrent: boolean = false) {
 	const [match, setMatch] = useState<LiveMatch>(initialMatch);
 	const [isDeleted, setIsDeleted] = useState(false);
-	const eventSourceRef = useRef<EventSource | null>(null);
+	const socketRef = useRef<WebSocket | null>(null);
 	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 	const isPlaceholder = initialMatch.id === "placeholder";
 
-	// Clean up function to handle both eventSource and polling interval
-	const cleanUp = () => {
-		if (eventSourceRef.current) {
-			eventSourceRef.current.close();
-			eventSourceRef.current = null;
-		}
-
+	const clearFallback = useCallback(() => {
 		if (intervalRef.current) {
 			clearInterval(intervalRef.current);
 			intervalRef.current = null;
 		}
-	};
+	}, []);
 
-	// Setup SSE connection
+	const cleanUp = useCallback(() => {
+		if (socketRef.current) {
+			socketRef.current.onclose = null;
+			socketRef.current.onerror = null;
+			socketRef.current.onmessage = null;
+			socketRef.current.close();
+			socketRef.current = null;
+		}
+
+		clearFallback();
+	}, [clearFallback]);
+
+	const startPollingFallback = useCallback(() => {
+		if (intervalRef.current) return;
+
+		intervalRef.current = setInterval(async () => {
+			try {
+				if (isCurrent || isPlaceholder) {
+					const data = await getCurrentLiveMatch();
+					if (data) {
+						setIsDeleted(false);
+						setMatch(data);
+					}
+				} else {
+					const data = await getMatch(initialMatch.id);
+					if (data) {
+						setMatch(data);
+					}
+				}
+			} catch (error) {
+				console.error("Error polling for match updates", error);
+			}
+		}, 5000);
+	}, [initialMatch.id, isCurrent, isPlaceholder]);
+
 	useEffect(() => {
-		const matchIdForEvents = isCurrent || isPlaceholder ? "current" : initialMatch.id;
-		eventSourceRef.current = new EventSource(`/api/events?matchId=${matchIdForEvents}`);
+		let cancelled = false;
 
-		// Regular updates
-		eventSourceRef.current.onmessage = (event: MessageEvent) => {
-			const updatedMatch: Match = JSON.parse(event.data);
-			if (updatedMatch) setMatch(updatedMatch);
-		};
-
-		// Handle match deletion events
-		eventSourceRef.current.addEventListener("matchDeleted", (event: MessageEvent) => {
-			const deletedMatchId = event.data;
-
-			if (!isCurrent && deletedMatchId === initialMatch.id) {
-				// This specific match was deleted
-				setIsDeleted(true);
-				// Add a deleted flag to the match
-				setMatch(prevMatch => ({
-					...prevMatch,
-					_deleted: true
-				}));
-			}
-			// For "current" mode, we'll automatically receive the next match or placeholder
-		});
-
-		eventSourceRef.current.onerror = () => {
-			// Close the erroring connection
-			if (eventSourceRef.current) {
-				eventSourceRef.current.close();
-				eventSourceRef.current = null;
+		const initialise = async () => {
+			try {
+				await fetch("/api/realtime");
+			} catch (error) {
+				console.warn("Unable to warm up realtime endpoint", error);
 			}
 
-			// Fallback to polling if SSE fails
-			console.warn("Server-sent events failed, falling back to polling");
+			if (cancelled) return;
 
-			// Set up polling as fallback
-			intervalRef.current = setInterval(async () => {
+			const matchIdForEvents = isCurrent || isPlaceholder ? "current" : initialMatch.id;
+			const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+			const socket = new WebSocket(`${protocol}://${window.location.host}/api/realtime?matchId=${matchIdForEvents}`);
+
+			socketRef.current = socket;
+
+			socket.onmessage = event => {
 				try {
-					let data;
-					// For placeholder or current mode, poll for current matches
-					if (isCurrent || isPlaceholder) {
-						data = await getCurrentLiveMatch();
-						// Only update if we got a real match
-						if (data) {
-							setMatch(data);
-						}
-					} else {
-						// For a specific match, just update the current data
-						data = await getMatch(initialMatch.id);
-						if (data) {
-							setMatch(data);
+					const message = JSON.parse(event.data) as RealtimeMessage;
+					if (message.type === "match:update") {
+						setIsDeleted(false);
+						setMatch(message.payload);
+					} else if (message.type === "match:deleted" && !isCurrent) {
+						if (message.payload.matchId === initialMatch.id) {
+							setIsDeleted(true);
+							setMatch(prevMatch => ({ ...prevMatch, _deleted: true }));
 						}
 					}
 				} catch (error) {
-					console.error("Error polling for match updates", error);
+					console.error("Failed to parse realtime message", error);
 				}
-			}, 5000); // Poll every 5 seconds
+			};
+
+			socket.onerror = () => {
+				socket.close();
+			};
+
+			socket.onclose = () => {
+				if (cancelled) return;
+				socketRef.current = null;
+				startPollingFallback();
+			};
 		};
 
-		return cleanUp;
-	}, [initialMatch.id, isCurrent, isPlaceholder]);
+		initialise();
+
+		return () => {
+			cancelled = true;
+			cleanUp();
+		};
+	}, [cleanUp, initialMatch.id, isCurrent, isPlaceholder, startPollingFallback]);
 
 	return { match, isDeleted };
 }

@@ -14,7 +14,7 @@ import {
 	SetCountUpdate,
 	TeamSide
 } from "../../types/types";
-import { sendMatchDeleteUpdate, sendMatchUpdate } from "@/app/lib/connectionsStore";
+import { broadcastMatchDeletion, broadcastMatchUpdate } from "@/app/lib/connectionsStore";
 
 const dataFilePath = path.join(process.cwd(), "data", "matches.json");
 
@@ -235,7 +235,8 @@ async function persistMatch(match: Match, matches?: Match[]): Promise<Match> {
 	revalidatePath("/match/current");
 	revalidatePath("/");
 
-	await sendMatchUpdate(match.id, match, isCurrentMatch);
+	const currentlyHighlighted = await isCurrentMatch(match);
+	broadcastMatchUpdate(match.id, match, { isCurrentMatch: currentlyHighlighted });
 	return match;
 }
 
@@ -267,7 +268,8 @@ async function createMatch(formData: InitialMatchData): Promise<Match> {
 	revalidatePath("/");
 	revalidatePath("/match/current");
 
-	await sendMatchUpdate(newMatch.id, newMatch, isCurrentMatch);
+	const currentlyHighlighted = await isCurrentMatch(newMatch);
+	broadcastMatchUpdate(newMatch.id, newMatch, { isCurrentMatch: currentlyHighlighted });
 	return newMatch;
 }
 
@@ -289,7 +291,6 @@ async function startMatch(id: string): Promise<Match> {
 
 	return persistMatch(updated);
 }
-
 async function updateSetScore(matchId: string, update: SetScoreUpdate): Promise<Match> {
 	const match = await readMatchFromFile(matchId);
 	if (!match) throw new Error("Match not found");
@@ -439,7 +440,10 @@ async function deleteMatch(formData: FormData): Promise<void> {
 	await saveMatches(filteredMatches);
 
 	if (matchToDelete) {
-		await sendMatchDeleteUpdate(matchId);
+		const liveMatches = filteredMatches.filter(item => item.status === "live");
+		liveMatches.sort((a, b) => (b.startedAt ?? 0) - (a.startedAt ?? 0));
+		const nextCurrentMatch = liveMatches[0];
+		broadcastMatchDeletion(matchId, nextCurrentMatch);
 	}
 
 	revalidatePath("/admin");

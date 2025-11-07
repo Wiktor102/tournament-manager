@@ -1,97 +1,109 @@
 import { v4 as uuid } from "uuid";
+import type { WebSocket } from "ws";
 import { Match } from "@/types/types";
-import { getCurrentLiveMatch } from "../actions/matchActions";
 
-// Define a type for our global store
-declare let global: {
-	connectionStore: Map<string, ReadableStreamController<Uint8Array>> | undefined;
+type Connection = {
+	id: string;
+	channel: string;
+	socket: WebSocket;
 };
 
-// Initialize the global connection store if it doesn't exist
-if (!global.connectionStore) {
-	global.connectionStore = new Map<string, ReadableStreamController<Uint8Array>>();
+type ConnectionStore = Map<string, Connection>;
+
+declare global {
+	var __matchConnections: ConnectionStore | undefined;
 }
 
-// Add a connection for a match
-export function addConnection(matchId: string, controller: ReadableStreamController<Uint8Array>): string {
-	const id = `${uuid()}#${matchId}`;
-	global.connectionStore!.set(id, controller);
-	console.log("Connection added", id, "Total connections:", global.connectionStore!.size);
+const PLACEHOLDER_SETS: Match["sets"] = [
+	{ setNumber: 1, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false },
+	{ setNumber: 2, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false }
+];
+
+export const PLACEHOLDER_MATCH: Match = {
+	id: "placeholder",
+	team1: "",
+	team2: "",
+	status: "scheduled",
+	rank: "1/16",
+	format: "twoSetsTo11",
+	sets: PLACEHOLDER_SETS,
+	currentSet: 0,
+	servingTeam: "team1",
+	decidedByTotalPoints: false
+};
+
+function getStore(): ConnectionStore {
+	if (!globalThis.__matchConnections) {
+		globalThis.__matchConnections = new Map();
+	}
+	return globalThis.__matchConnections;
+}
+
+function isOpen(socket: WebSocket) {
+	return socket.readyState === socket.OPEN;
+}
+
+function safeSend(connectionId: string, connection: Connection, payload: string) {
+	if (!isOpen(connection.socket)) {
+		getStore().delete(connectionId);
+		return;
+	}
+
+	try {
+		connection.socket.send(payload);
+	} catch (error) {
+		console.error("Error sending realtime payload", error);
+		getStore().delete(connectionId);
+	}
+}
+
+export function addConnection(channel: string, socket: WebSocket): string {
+	const id = `${uuid()}#${channel}`;
+	getStore().set(id, { id, channel, socket });
 	return id;
 }
 
-// Remove a connection
 export function removeConnection(connectionId: string) {
-	global.connectionStore!.delete(connectionId);
-	console.log("Connection removed", connectionId, "Total connections:", global.connectionStore!.size);
-}
-
-// Get connections for a match
-export function getConnections() {
-	if (!global.connectionStore) {
-		console.error("Global connection store is undefined!");
-		global.connectionStore = new Map<string, ReadableStreamController<Uint8Array>>();
-	}
-	return global.connectionStore;
-}
-
-// Send update to all connections for a match
-export async function sendMatchUpdate(matchId: string, data: Match, isCurrentMatchFn: (match: Match) => Promise<boolean>) {
-	const connections = getConnections();
-	// console.log("sendMatchUpdate called, connections:", connections.size, "keys:", Array.from(connections.keys()));
-
-	// Send to specific match listeners
-	for (const [key, controller] of connections.entries()) {
+	const connection = getStore().get(connectionId);
+	if (connection && isOpen(connection.socket)) {
 		try {
-			// Send to both specific match listeners and "current" listeners.
-			if (
-				key.endsWith(`#${matchId}`) ||
-				(key.endsWith("#current") && ((await isCurrentMatchFn(data)) || data.status === "finished"))
-			) {
-				const encoder = new TextEncoder();
-				controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-			}
+			connection.socket.close();
 		} catch (error) {
-			console.error("Error sending update to connection", key, error);
-			// Remove failed connections
-			removeConnection(key);
+			console.error("Error closing websocket connection", error);
+		}
+	}
+	getStore().delete(connectionId);
+}
+
+export function getConnections(): ConnectionStore {
+	return getStore();
+}
+
+export function broadcastMatchUpdate(matchId: string, match: Match, options: { isCurrentMatch: boolean }) {
+	const payload = JSON.stringify({ type: "match:update", payload: match });
+	for (const [id, connection] of getStore()) {
+		const shouldNotifySpecific = connection.channel === matchId;
+		const shouldNotifyCurrent =
+			connection.channel === "current" && (options.isCurrentMatch || match.status === "finished");
+		if (shouldNotifySpecific || shouldNotifyCurrent) {
+			safeSend(id, connection, payload);
 		}
 	}
 }
 
-// Send update to all connections when a match is deleted
-export async function sendMatchDeleteUpdate(matchId: string) {
-	// Get the new current match (if any)
-	const nextCurrentMatch = await getCurrentLiveMatch();
-	const encoder = new TextEncoder();
-	const connections = getConnections();
+export function broadcastMatchDeletion(matchId: string, nextCurrentMatch?: Match) {
+	const deletionMessage = JSON.stringify({ type: "match:deleted", payload: { matchId } });
+	const nextMatch = nextCurrentMatch ?? PLACEHOLDER_MATCH;
+	const nextMatchMessage = JSON.stringify({ type: "match:update", payload: nextMatch });
 
-	for (const [key, controller] of connections.entries()) {
-		if (key.endsWith(`#${matchId}`)) {
-			// For connections listening to the specific deleted match
-			// Send a deletion event
-			controller.enqueue(encoder.encode(`event: matchDeleted\ndata: ${matchId}\n\n`));
-		} else if (key.endsWith("#current")) {
-			if (nextCurrentMatch) {
-				controller.enqueue(encoder.encode(`data: ${JSON.stringify(nextCurrentMatch)}\n\n`));
-			} else {
-				const placeholder: Match = {
-					id: "placeholder",
-					team1: "",
-					team2: "",
-					status: "scheduled",
-					rank: "1/16",
-					format: "twoSetsTo11",
-					sets: [
-						{ setNumber: 1, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false },
-						{ setNumber: 2, targetPoints: 11, team1Points: 0, team2Points: 0, isTieBreak: false }
-					],
-					currentSet: 0,
-					servingTeam: "team1",
-					decidedByTotalPoints: false
-				};
-				controller.enqueue(encoder.encode(`data: ${JSON.stringify(placeholder)}\n\n`));
-			}
+	for (const [id, connection] of getStore()) {
+		if (connection.channel === matchId) {
+			safeSend(id, connection, deletionMessage);
+			continue;
+		}
+
+		if (connection.channel === "current") {
+			safeSend(id, connection, nextMatchMessage);
 		}
 	}
 }

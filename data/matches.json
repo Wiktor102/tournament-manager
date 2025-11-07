@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": "061a800b-a882-4d48-b6fd-aa8114e2c9d7",
+    "team1": "1A",
+    "team2": "2D",
+    "status": "live",
+    "rank": "1/16",
+    "format": "twoSetsTo11",
+    "sets": [
+      {
+        "setNumber": 1,
+        "targetPoints": 11,
+        "team1Points": 2,
+        "team2Points": 1,
+        "isTieBreak": false
+      }
+    ],
+    "currentSet": 0,
+    "servingTeam": "team2",
+    "startedAt": 1762539635801,
+    "decidedByTotalPoints": false
+  }
+]
