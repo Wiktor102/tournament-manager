@@ -33,7 +33,7 @@
 
 .score-sets {
 	text-align: center;
-	font-size: 1.4rem;
+	font-size: 1.25rem;
 	background-color: #005bb5;
 	padding: 0.35rem 0.75rem;
 	border-radius: 0.75rem;
@@ -60,66 +60,38 @@
 	display: flex;
 	position: relative;
 	align-items: center;
-	gap: 1rem;
-	margin-inline: 1.25rem;
-	padding: 0.5rem 1.5rem;
-	font-size: 2rem;
-	background-color: #00376f;
-	border-radius: 1.5rem;
-	border: 2px solid rgba(255, 255, 255, 0.15);
+	margin-inline: 1rem;
+	padding: 0.25rem 1rem;
 
-	&--tiebreak {
-		background-color: #6c2ae5;
-		border-color: #b99bff;
-	}
+	font-size: 1.5rem;
+	background-color: #00376f;
 
 	img {
-		height: 3.25rem;
-		width: 3.25rem;
-		object-fit: contain;
+		height: 3rem;
+		width: 3rem;
+		object-fit: scale-down;
+		margin-inline: 0.5rem;
 	}
 
 	&::before {
-		content: attr(data-label);
+		content: attr(data-rank) ": " attr(data-label);
 		position: absolute;
 		top: 0;
-		left: 50%;
-		transform: translate(-50%, -110%);
-		padding: 0.2rem 0.75rem;
-		border-radius: 999px;
+		left: 0;
+		right: 0;
+		text-align: center;
+		translate: 0 -100%;
+
+		padding: 0.25rem 0.5rem;
+		clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+		border-top-left-radius: 5rem;
+		border-top-right-radius: 5rem;
+
+		font-size: 1rem;
 		background-color: #005bb5;
 		font-size: 0.85rem;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
-	}
-
-	&::after {
-		content: attr(data-rank);
-		position: absolute;
-		bottom: -1.75rem;
-		left: 50%;
-		transform: translateX(-50%);
-		font-size: 0.85rem;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		color: rgba(255, 255, 255, 0.8);
-	}
-}
-
-.score-points {
-	font-weight: 700;
-	min-width: 2.5rem;
-	text-align: center;
-
-	&::before {
-		display: block;
-		content: attr(data-label);
-		font-size: 0.75rem;
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: rgba(255, 255, 255, 0.7);
-		margin-bottom: 0.2rem;
 	}
 }
 
@@ -142,11 +114,12 @@
 }
 
 .no-match-widget {
-	justify-content: center;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding-block: 0.75rem;
 }
 
 .no-match-text {
-	padding-block: 0.5rem;
 	color: white;
 	font-style: italic;
 }
@@ -167,8 +140,4 @@
 	animation: playfulBounce 1s infinite;
 	border: 2px solid #ffd700; // gold border
 	border-radius: 10rem;
-}
-
-.team-name--serving {
-	color: #ffd700;
 }

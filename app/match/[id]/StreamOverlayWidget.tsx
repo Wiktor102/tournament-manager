@@ -26,24 +26,20 @@ const EMPTY_MATCH_PLACEHOLDER: Match = {
 	decidedByTotalPoints: false
 };
 
-function StreamOverlayWidget({
-	initialMatch,
-	isCurrent = false,
-	noMatchAvailable = false
-}: {
+interface StreamOverlayWidgetProps {
 	initialMatch?: Match;
 	isCurrent?: boolean;
 	noMatchAvailable?: boolean;
-}) {
+}
+
+function StreamOverlayWidget({ initialMatch, isCurrent = false, noMatchAvailable = false }: StreamOverlayWidgetProps) {
 	// Handle the case where no match is available but we want to listen for one
 	const matchToUse = noMatchAvailable ? EMPTY_MATCH_PLACEHOLDER : initialMatch!;
 	const { match, isDeleted } = useLiveMatch(matchToUse, isCurrent);
 	const [hasMatch, setHasMatch] = useState(!noMatchAvailable);
 
 	useEffect(() => {
-		if (noMatchAvailable) {
-			setHasMatch(match.id !== "placeholder");
-		}
+		if (noMatchAvailable) setHasMatch(match.id !== "placeholder");
 	}, [match.id, noMatchAvailable]);
 
 	const isFinished = match.status === "finished";
@@ -72,12 +68,10 @@ function StreamOverlayWidget({
 	// Show empty state if no match available
 	if ((noMatchAvailable && !hasMatch) || match.id === "placeholder") {
 		return (
-			<>
+			<div className="counter-widget widget no-match-widget">
 				<h3>Liga elektronika</h3>
-				{/* <div className="counter-widget widget no-match-widget">
-					<span className="no-match-text">brak meczu</span>
-				</div> */}
-			</>
+				<span className="no-match-text">brak meczu - przerwa</span>
+			</div>
 		);
 	}
 
