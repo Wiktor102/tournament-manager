@@ -60,6 +60,44 @@
 		}
 	}
 
+	.set-counter {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+
+		h3 {
+			margin: 0;
+			font-size: 1.2rem;
+		}
+
+		&__rows {
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+		}
+
+		&__row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 1rem;
+			padding: 0.5rem 0.25rem;
+			border-radius: 0.5rem;
+			background: rgba(255, 255, 255, 0.03);
+		}
+
+		&__team {
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			flex: 1;
+		}
+
+		&__controls {
+			justify-content: flex-end;
+		}
+	}
+
 	.set-score-table {
 		width: 100%;
 		border-collapse: collapse;
@@ -81,7 +119,7 @@
 		}
 
 		tbody tr.tie-break {
-			d td:first-child {
+			td:first-child {
 				font-style: italic;
 			}
 		}

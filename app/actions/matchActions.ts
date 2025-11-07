@@ -11,6 +11,7 @@ import {
 	TournamentRank,
 	VolleyballSet,
 	SetScoreUpdate,
+	SetCountUpdate,
 	TeamSide
 } from "../../types/types";
 import { sendMatchDeleteUpdate, sendMatchUpdate } from "@/app/lib/connectionsStore";
@@ -26,12 +27,10 @@ const FORMAT_BY_RANK: Record<TournamentRank, MatchFormat> = {
 	"O 3 miejsce": "bestOfThreeTo15"
 };
 
-const FORMAT_CONFIG: Record<MatchFormat, { targetPoints: number; setsToWin: number; maxSets: number }> = {
-	twoSetsTo11: { targetPoints: 11, setsToWin: 2, maxSets: 3 },
-	bestOfThreeTo15: { targetPoints: 15, setsToWin: 2, maxSets: 3 }
+const FORMAT_CONFIG: Record<MatchFormat, { targetPoints: number }> = {
+	twoSetsTo11: { targetPoints: 11 },
+	bestOfThreeTo15: { targetPoints: 15 }
 };
-
-const TWO_POINT_MARGIN = 2;
 const DEFAULT_RANK: TournamentRank = "1/16";
 const TOURNAMENT_RANKS: readonly TournamentRank[] = ["1/16", "1/8", "1/4", "1/2", "Finał", "O 3 miejsce"];
 
@@ -64,6 +63,14 @@ function determineFormat(rank: TournamentRank): MatchFormat {
 	return FORMAT_BY_RANK[rank] ?? "twoSetsTo11";
 }
 
+function getSetConfig(format: MatchFormat, setNumber: number): { targetPoints: number; isTieBreak: boolean } {
+	if (format === "twoSetsTo11" && setNumber >= 3) {
+		return { targetPoints: FORMAT_CONFIG[format].targetPoints, isTieBreak: true };
+	}
+
+	return { targetPoints: FORMAT_CONFIG[format].targetPoints, isTieBreak: false };
+}
+
 function createSet(setNumber: number, targetPoints: number, isTieBreak = false): VolleyballSet {
 	return {
 		setNumber,
@@ -74,126 +81,28 @@ function createSet(setNumber: number, targetPoints: number, isTieBreak = false):
 	};
 }
 
+function createSetForFormat(setNumber: number, format: MatchFormat): VolleyballSet {
+	const { targetPoints, isTieBreak } = getSetConfig(format, setNumber);
+	return createSet(setNumber, targetPoints, isTieBreak);
+}
+
 function createInitialSets(format: MatchFormat): VolleyballSet[] {
-	const baseTarget = FORMAT_CONFIG[format].targetPoints;
-	if (format === "twoSetsTo11") {
-		return [createSet(1, baseTarget), createSet(2, baseTarget)];
-	}
-
-	return [createSet(1, baseTarget), createSet(2, baseTarget), createSet(3, baseTarget, true)];
+	return [createSetForFormat(1, format)];
 }
 
-function totalPoints(sets: VolleyballSet[]): Record<TeamSide, number> {
-	return sets.reduce(
-		(acc, set) => {
-			acc.team1 += set.team1Points;
-			acc.team2 += set.team2Points;
-			return acc;
-		},
-		{ team1: 0, team2: 0 }
-	);
+function createNextSet(existingSets: VolleyballSet[], format: MatchFormat): VolleyballSet {
+	const nextNumber = (existingSets[existingSets.length - 1]?.setNumber ?? 0) + 1;
+	return createSetForFormat(nextNumber, format);
 }
 
-function findCurrentSetIndex(match: Match): number {
-	const firstOpenSet = match.sets.findIndex(set => !set.winner);
-	if (firstOpenSet === -1) {
-		return Math.max(match.sets.length - 1, 0);
-	}
-	return firstOpenSet;
+function cloneSets(sets: VolleyballSet[]): VolleyballSet[] {
+	return sets.map(set => ({ ...set }));
 }
 
-function evaluateMatchState(match: Match, options: { allowStatusMutation?: boolean } = {}): Match {
-	const { allowStatusMutation = true } = options;
-	const config = FORMAT_CONFIG[match.format];
-	const now = Date.now();
-
-	const setsWon: Record<TeamSide, number> = { team1: 0, team2: 0 };
-
-	match.sets = match.sets.map((set, index) => {
-		const normalized: VolleyballSet = {
-			setNumber: set.setNumber ?? index + 1,
-			targetPoints: set.targetPoints ?? (set.isTieBreak && match.format === "twoSetsTo11" ? 1 : config.targetPoints),
-			team1Points: Number.isFinite(set.team1Points) ? set.team1Points : 0,
-			team2Points: Number.isFinite(set.team2Points) ? set.team2Points : 0,
-			winner: set.winner === "team2" ? "team2" : set.winner === "team1" ? "team1" : undefined,
-			isTieBreak: Boolean(set.isTieBreak),
-			endedAt: set.endedAt
-		};
-
-		const leadingTeam =
-			normalized.team1Points === normalized.team2Points
-				? undefined
-				: normalized.team1Points > normalized.team2Points
-				? "team1"
-				: "team2";
-		const threshold = normalized.targetPoints;
-		const margin = Math.abs(normalized.team1Points - normalized.team2Points);
-
-		if (
-			!normalized.winner &&
-			leadingTeam &&
-			Math.max(normalized.team1Points, normalized.team2Points) >= threshold &&
-			margin >= TWO_POINT_MARGIN
-		) {
-			normalized.winner = leadingTeam;
-			normalized.endedAt = normalized.endedAt ?? now;
-		}
-
-		if (normalized.winner) {
-			setsWon[normalized.winner] += 1;
-		}
-
-		return normalized;
-	});
-
-	match.currentSet = findCurrentSetIndex(match);
-
-	if (!allowStatusMutation) {
-		return match;
-	}
-
-	const hasStarted = Boolean(match.startedAt);
-	let winner: TeamSide | undefined;
-	let decidedByTotalPoints = false;
-
-	if (match.format === "twoSetsTo11") {
-		const completedSets = match.sets.filter(set => Boolean(set.winner)).length;
-
-		if (setsWon.team1 === config.setsToWin || setsWon.team2 === config.setsToWin) {
-			winner = setsWon.team1 > setsWon.team2 ? "team1" : "team2";
-		} else if (completedSets >= 2) {
-			if (setsWon.team1 === setsWon.team2) {
-				const totals = totalPoints(match.sets.slice(0, 2));
-				if (totals.team1 !== totals.team2) {
-					winner = totals.team1 > totals.team2 ? "team1" : "team2";
-					decidedByTotalPoints = true;
-				} else if (match.sets.length < config.maxSets) {
-					match.sets.push(createSet(match.sets.length + 1, 1, true));
-					match.currentSet = findCurrentSetIndex(match);
-				}
-			} else {
-				winner = setsWon.team1 > setsWon.team2 ? "team1" : "team2";
-			}
-		}
-	} else {
-		if (setsWon.team1 === config.setsToWin || setsWon.team2 === config.setsToWin) {
-			winner = setsWon.team1 > setsWon.team2 ? "team1" : "team2";
-		}
-	}
-
-	if (winner) {
-		match.status = "finished";
-		match.winner = winner;
-		match.decidedByTotalPoints = decidedByTotalPoints;
-		match.endedAt = match.endedAt ?? now;
-	} else if (hasStarted) {
-		match.status = "live";
-		match.winner = undefined;
-		match.decidedByTotalPoints = false;
-		match.endedAt = undefined;
-	}
-
-	return match;
+function findCurrentSetIndex(sets: VolleyballSet[]): number {
+	if (sets.length === 0) return 0;
+	const firstOpenSet = sets.findIndex(set => !set.winner);
+	return firstOpenSet === -1 ? Math.max(sets.length - 1, 0) : firstOpenSet;
 }
 
 function normaliseStatus(status: string | undefined): Match["status"] {
@@ -208,23 +117,19 @@ function normaliseStatus(status: string | undefined): Match["status"] {
 
 function normalizeSetInput(rawSet: unknown, index: number, format: MatchFormat): VolleyballSet {
 	if (typeof rawSet !== "object" || rawSet === null) {
-		const isPotentialTieBreak = format === "twoSetsTo11" ? index >= 2 : index === 2;
-		const target = isPotentialTieBreak && format === "twoSetsTo11" ? 1 : FORMAT_CONFIG[format].targetPoints;
-		return createSet(index + 1, target, isPotentialTieBreak);
+		const { targetPoints, isTieBreak } = getSetConfig(format, index + 1);
+		return createSet(index + 1, targetPoints, isTieBreak);
 	}
 
 	const record = rawSet as Record<string, unknown>;
 	const isTieBreak = record.isTieBreak === true;
 	const setNumber =
 		typeof record.setNumber === "number" && Number.isFinite(record.setNumber) ? record.setNumber : index + 1;
-	let targetPoints =
+	const defaultConfig = getSetConfig(format, setNumber);
+	const targetPoints =
 		typeof record.targetPoints === "number" && Number.isFinite(record.targetPoints)
 			? record.targetPoints
-			: FORMAT_CONFIG[format].targetPoints;
-
-	if (isTieBreak && format === "twoSetsTo11") {
-		targetPoints = 1;
-	}
+			: defaultConfig.targetPoints;
 
 	return {
 		setNumber,
@@ -232,7 +137,7 @@ function normalizeSetInput(rawSet: unknown, index: number, format: MatchFormat):
 		team1Points: coerceNumber(record.team1Points),
 		team2Points: coerceNumber(record.team2Points),
 		winner: coerceTeamSide(record.winner),
-		isTieBreak,
+		isTieBreak: isTieBreak || defaultConfig.isTieBreak,
 		endedAt: typeof record.endedAt === "number" ? record.endedAt : undefined
 	};
 }
@@ -265,6 +170,8 @@ function normalizeMatch(raw: unknown): Match {
 		? setsSource.map((set, index) => normalizeSetInput(set, index, format))
 		: createInitialSets(format);
 
+	const sanitizedSets = sets.length ? sets : createInitialSets(format);
+
 	const match: Match = {
 		id: typeof record.id === "string" ? record.id : uuid(),
 		team1: typeof record.team1 === "string" ? record.team1.toUpperCase() : "",
@@ -272,7 +179,7 @@ function normalizeMatch(raw: unknown): Match {
 		status: normaliseStatus(typeof record.status === "string" ? record.status : undefined),
 		rank,
 		format,
-		sets,
+		sets: sanitizedSets,
 		currentSet: 0,
 		servingTeam: coerceTeamSide(record.servingTeam) ?? "team1",
 		startedAt: typeof record.startedAt === "number" ? record.startedAt : undefined,
@@ -285,10 +192,9 @@ function normalizeMatch(raw: unknown): Match {
 	match.currentSet =
 		storedCurrentSet !== undefined
 			? Math.min(storedCurrentSet, Math.max(match.sets.length - 1, 0))
-			: findCurrentSetIndex(match);
+			: findCurrentSetIndex(match.sets);
 
-	const allowStatusMutation = match.status !== "scheduled";
-	return evaluateMatchState(match, { allowStatusMutation });
+	return match;
 }
 
 async function readMatchesFromFile(): Promise<Match[]> {
@@ -370,15 +276,16 @@ async function startMatch(id: string): Promise<Match> {
 	if (!match) throw new Error("Match not found");
 	if (match.status !== "scheduled") throw new Error("Match must be scheduled to start");
 
-	const updated = evaluateMatchState(
-		{
-			...match,
-			status: "live",
-			startedAt: Date.now(),
-			sets: match.sets.map(set => ({ ...set }))
-		},
-		{ allowStatusMutation: true }
-	);
+	const sets = cloneSets(match.sets);
+	const currentSetIndex = findCurrentSetIndex(sets);
+
+	const updated: Match = {
+		...match,
+		status: "live",
+		startedAt: Date.now(),
+		sets,
+		currentSet: currentSetIndex
+	};
 
 	return persistMatch(updated);
 }
@@ -387,7 +294,7 @@ async function updateSetScore(matchId: string, update: SetScoreUpdate): Promise<
 	const match = await readMatchFromFile(matchId);
 	if (!match) throw new Error("Match not found");
 
-	const sets = match.sets.map(set => ({ ...set }));
+	const sets = cloneSets(match.sets);
 	const targetSet = sets[update.setIndex];
 	if (!targetSet) throw new Error("Set not found");
 
@@ -395,13 +302,90 @@ async function updateSetScore(matchId: string, update: SetScoreUpdate): Promise<
 	const nextValue = targetSet[key] + update.change;
 	targetSet[key] = Math.max(0, nextValue);
 
-	const updatedMatch = evaluateMatchState(
-		{
+	const updatedMatch: Match = {
+		...match,
+		sets,
+		servingTeam: update.change > 0 ? update.team : match.servingTeam,
+		currentSet: findCurrentSetIndex(sets)
+	};
+
+	return persistMatch(updatedMatch);
+}
+
+async function updateSetCount(matchId: string, update: SetCountUpdate): Promise<Match> {
+	const match = await readMatchFromFile(matchId);
+	if (!match) throw new Error("Match not found");
+
+	const sets = cloneSets(match.sets);
+	if (sets.length === 0) {
+		sets.push(createSetForFormat(1, match.format));
+	}
+
+	if (update.change === 1) {
+		const currentIndex = findCurrentSetIndex(sets);
+		const now = Date.now();
+		const activeSet = (
+			sets[currentIndex] ? { ...sets[currentIndex] } : createSetForFormat(currentIndex + 1, match.format)
+		) as VolleyballSet;
+		sets.splice(currentIndex + 1);
+		activeSet.winner = update.team;
+		activeSet.endedAt = now;
+		sets[currentIndex] = activeSet;
+
+		const nextSet = createNextSet(sets, match.format);
+		sets.push(nextSet);
+
+		const updatedMatch: Match = {
 			...match,
-			sets
-		},
-		{ allowStatusMutation: true }
-	);
+			sets,
+			currentSet: sets.length - 1
+		};
+
+		return persistMatch(updatedMatch);
+	}
+
+	// change === -1
+	while (sets.length > 0 && !sets[sets.length - 1].winner) {
+		sets.pop();
+	}
+
+	const lastFinishedIndex = [...sets]
+		.map((set, index) => ({ set, index }))
+		.filter(({ set }) => Boolean(set.winner))
+		.pop()?.index;
+
+	if (lastFinishedIndex === undefined) {
+		return match;
+	}
+
+	const lastFinished = sets[lastFinishedIndex];
+	if (lastFinished.winner !== update.team) {
+		return match;
+	}
+
+	sets[lastFinishedIndex] = {
+		...lastFinished,
+		winner: undefined,
+		endedAt: undefined
+	};
+	sets.splice(lastFinishedIndex + 1);
+
+	if (sets.length === 0) {
+		const fallbackSet = createSetForFormat(1, match.format);
+		const updatedMatch: Match = {
+			...match,
+			sets: [fallbackSet],
+			currentSet: 0
+		};
+		return persistMatch(updatedMatch);
+	}
+
+	const currentSetIndex = findCurrentSetIndex(sets);
+	const updatedMatch: Match = {
+		...match,
+		sets,
+		currentSet: currentSetIndex
+	};
 
 	return persistMatch(updatedMatch);
 }
@@ -422,15 +406,11 @@ async function endMatch(id: string): Promise<Match> {
 	const match = await readMatchFromFile(id);
 	if (!match) throw new Error("Match not found");
 
-	const updated = evaluateMatchState(
-		{
-			...match,
-			status: "finished",
-			sets: match.sets.map(set => ({ ...set })),
-			endedAt: Date.now()
-		},
-		{ allowStatusMutation: true }
-	);
+	const updated: Match = {
+		...match,
+		status: "finished",
+		endedAt: Date.now()
+	};
 
 	return persistMatch(updated);
 }
@@ -478,4 +458,4 @@ async function isCurrentMatch(match: Match): Promise<boolean> {
 }
 
 export { readMatchesFromFile as getMatches, readMatchFromFile as getMatch, getCurrentLiveMatch };
-export { createMatch, startMatch, updateSetScore, setServingTeam, endMatch, deleteMatch, isCurrentMatch };
+export { createMatch, startMatch, updateSetScore, updateSetCount, setServingTeam, endMatch, deleteMatch, isCurrentMatch };

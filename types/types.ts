@@ -44,3 +44,8 @@ export interface SetScoreUpdate {
 	change: 1 | -1;
 	setIndex: number;
 }
+
+export interface SetCountUpdate {
+	team: TeamSide;
+	change: 1 | -1;
+}
