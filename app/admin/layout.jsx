@@ -44,9 +44,7 @@ export default function AdminLayout({ children }) {
 					</ul>
 				</nav>
 			</header>
-			<main className="main-content">
-				<div className="content-container">{children}</div>
-			</main>
+			<main className="main-content">{children}</main>
 		</div>
 	);
 }

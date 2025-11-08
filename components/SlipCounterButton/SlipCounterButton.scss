@@ -1,23 +1,27 @@
 .slip-counter-button {
-	background-color: #2196f3;
-	color: white;
+	background-color: var(--color-blue-500);
+	color: var(--color-gray-50);
 	border: none;
 	border-radius: 4px;
 	padding: 10px 16px;
 	font-size: 0.9rem;
 	font-weight: 600;
 	cursor: pointer;
-	transition: background-color 0.2s;
+	transition: background-color 0.2s ease, box-shadow 0.2s ease;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	box-shadow: 0 8px 18px rgba(3, 16, 43, 0.35);
 
 	&:hover {
-		background-color: #1976d2;
+		background-color: var(--color-blue-600);
+		box-shadow: 0 12px 24px rgba(3, 16, 43, 0.45);
 	}
 
 	&:disabled {
-		background-color: #bbdefb;
+		background-color: rgba(0, 91, 181, 0.25);
+		color: rgba(243, 246, 255, 0.5);
 		cursor: not-allowed;
+		box-shadow: none;
 	}
 }

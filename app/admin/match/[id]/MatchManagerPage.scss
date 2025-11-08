@@ -38,7 +38,7 @@
 		flex-wrap: wrap;
 		gap: 1rem;
 		margin-bottom: 1.5rem;
-		color: rgba(255, 255, 255, 0.85);
+		color: rgba(191, 208, 244, 0.85);
 		font-size: 0.95rem;
 
 		span {
@@ -51,11 +51,11 @@
 	.winner-banner {
 		margin-bottom: 1.5rem;
 		padding: 0.75rem 1rem;
-		background: rgba(255, 215, 0, 0.15);
-		border: 1px solid rgba(255, 215, 0, 0.4);
+		background: rgba(255, 215, 0, 0.18);
+		border: 1px solid rgba(255, 215, 0, 0.45);
 		border-radius: 0.5rem;
 		font-weight: 600;
-		color: #ffe28a;
+		color: #ffd700;
 	}
 
 	.live-score {

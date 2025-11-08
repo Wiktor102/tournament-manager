@@ -5,57 +5,57 @@
 }
 
 :root {
-    /* Base colors */
-    --color-white: #ffffff;
-    --color-black: #000000;
-    --color-gray-50: #f9fafb;
-    --color-gray-100: #ededed;
-    --color-gray-200: #e5e7eb;
-    --color-gray-300: #d1d5db;
-    --color-gray-400: #a0aec0;
-    --color-gray-500: #6b7280;
-    --color-gray-600: #4b5563;
-    --color-gray-700: #333333;
-    --color-gray-800: #242424;
-    --color-gray-900: #1a1a1a;
-    --color-gray-950: #0a0a0a;
+    /* Core palette inspired by the stream overlay */
+    --color-white: #f3f6ff;
+    --color-black: #030a1b;
 
-    --color-green-500: #16a34a;
-    --color-green-600: #15803d;
+    --color-gray-50: #f3f6ff;
+    --color-gray-100: #dfe8fb;
+    --color-gray-200: #c7d5f5;
+    --color-gray-300: #a7bce6;
+    --color-gray-400: #89a2d3;
+    --color-gray-500: #7088bd;
+    --color-gray-600: #586f9f;
+    --color-gray-700: #40547e;
+    --color-gray-800: #2b3a61;
+    --color-gray-900: #1a2746;
+    --color-gray-950: #0b1733;
 
-    --color-blue-500: #2563eb;
-    --color-blue-600: #1d4ed8;
+    --color-midnight-900: #041c3d;
+    --color-midnight-800: #062a57;
+    --color-midnight-700: #0a3973;
+    --color-midnight-600: #124989;
 
-    --color-red-500: #dc2626;
-    --color-red-600: #b91c1c;
+    --color-green-500: #2ec4a6;
+    --color-green-600: #24a18a;
 
-    --color-yellow-400: #f1c40f;
+    --color-blue-400: #2f7de0;
+    --color-blue-500: #005bb5;
+    --color-blue-600: #003f86;
 
-    /* Semantic variables - light theme defaults */
-    --background: var(--color-white);
-    --foreground: var(--color-gray-900);
-    --surface: var(--color-white);
-    --section-border: var(--color-gray-200);
-    --empty-state: var(--color-gray-500);
-    --text-secondary: var(--color-gray-600);
-    --shadow: rgba(0, 0, 0, 0.1);
-    --header-background: var(--color-gray-200);
+    --color-red-500: #f16e7c;
+    --color-red-600: #d95a68;
 
-    /* Semantic variables - dark theme overrides */
+    --color-yellow-300: #f8dc7a;
+    --color-yellow-400: #ffd700;
+    --color-yellow-500: #f4c847;
+
+    /* Semantic variables */
     --background: var(--color-gray-950);
-    --foreground: var(--color-gray-100);
-    --surface: var(--color-gray-800);
-    --section-border: var(--color-gray-700);
-    --empty-state: var(--color-gray-400);
-    --text-secondary: var(--color-gray-400);
-    --shadow: rgba(0, 0, 0, 0.5);
-    --header-background: var(--color-gray-900);
+    --foreground: var(--color-gray-50);
+    --surface: var(--color-midnight-800);
+    --section-border: rgba(47, 125, 224, 0.35);
+    --empty-state: rgba(191, 208, 244, 0.85);
+    --text-secondary: rgba(173, 195, 238, 0.85);
+    --shadow: rgba(3, 16, 43, 0.6);
+    --header-background: var(--color-midnight-700);
+    --border: rgba(255, 255, 255, 0.12);
 
     /* Button colors */
-    --button-live-score: var(--color-green-500);
-    --button-live-score-hover: var(--color-green-600);
+    --button-live-score: var(--color-yellow-400);
+    --button-live-score-hover: var(--color-yellow-500);
     --button-edit: var(--color-blue-500);
-    --button-edit-hover: var(--color-blue-600);
+    --button-edit-hover: var(--color-blue-400);
     --button-delete: var(--color-red-500);
     --button-delete-hover: var(--color-red-600);
     --link-hover: var(--color-yellow-400);
@@ -63,21 +63,23 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        /* Semantic variables - dark theme overrides */
+        /* Reinforce dark theme values */
         --background: var(--color-gray-950);
-        --foreground: var(--color-gray-100);
-        --surface: var(--color-gray-800);
-        --section-border: var(--color-gray-700);
-        --empty-state: var(--color-gray-400);
-        --text-secondary: var(--color-gray-400);
-        --shadow: rgba(0, 0, 0, 0.5);
-        --header-background: var(--color-gray-900);
+        --foreground: var(--color-gray-50);
+        --surface: var(--color-midnight-800);
+        --section-border: rgba(47, 125, 224, 0.35);
+        --empty-state: rgba(191, 208, 244, 0.85);
+        --text-secondary: rgba(173, 195, 238, 0.85);
+        --shadow: rgba(3, 16, 43, 0.6);
+        --header-background: var(--color-midnight-700);
+        --border: rgba(255, 255, 255, 0.12);
     }
 }
 
 html,
 body {
     max-width: 100vw;
+    height: 100%;
     overflow-x: hidden;
 }
 
@@ -113,8 +115,8 @@ a {
 .loading-spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid var(--color-gray-200);
-    border-top: 4px solid var(--color-blue-500);
+    border: 4px solid rgba(255, 255, 255, 0.08);
+    border-top: 4px solid var(--color-blue-400);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -131,7 +133,7 @@ a {
 /* Ensures proper color in dark mode */
 @media (prefers-color-scheme: dark) {
     .loading-spinner {
-        border-color: var(--color-gray-700);
-        border-top-color: var(--color-blue-500);
+        border-color: rgba(255, 255, 255, 0.12);
+        border-top-color: var(--color-blue-400);
     }
 }

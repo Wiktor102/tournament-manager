@@ -1,13 +1,22 @@
 .admin-page {
+	display: grid;
+	height: 100%;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto 1fr;
+	grid-template-areas: "header header" "add-match match-list";
+	gap: 0 2rem;
+
 	.page-title {
-		font-size: 1.875rem;
-		font-weight: bold;
+		grid-area: header;
 		margin-bottom: 1.5rem;
 		color: var(--foreground);
+		font-size: 1.875rem;
+		font-weight: bold;
 	}
 
 	.add-match-container {
-		margin-bottom: 2rem;
+		grid-area: add-match;
+		align-self: flex-start;
 		background-color: var(--surface);
 		padding: 1.5rem;
 		border-radius: 0.25rem;
@@ -22,6 +31,8 @@
 	}
 
 	.matches-container {
+		grid-area: match-list;
+		// height: 100%;
 		background-color: var(--surface);
 		border-radius: 0.25rem;
 		box-shadow: 0 1px 3px 0 var(--shadow);
